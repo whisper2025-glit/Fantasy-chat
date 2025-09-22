@@ -1,0 +1,362 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+}
+
+body {
+  min-height: 100vh;
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Enhanced scrollbar utilities */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+/* Custom styled scrollbars */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--primary)) hsl(var(--muted));
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 2px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary));
+  border-radius: 2px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary) / 0.8);
+}
+
+/* Smooth scrolling behavior */
+.smooth-scroll {
+  scroll-behavior: smooth;
+}
+
+/* Typing indicator animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Performance optimizations for scrolling */
+.scroll-container {
+  will-change: scroll-position;
+  transform: translateZ(0);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary));
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary) / 0.8);
+}
+
+/* Line clamp utilities */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+/* Hide scrollbar for mobile */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@layer base {
+  :root {
+    /* Light theme variables */
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 210 100% 50%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 84% 4.9%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 35%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 84% 4.9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 210 100% 50%;
+    --radius: 0.5rem;
+    --sidebar-background: 248 250 252;
+    --sidebar-foreground: 15 23 42;
+    --sidebar-primary: 210 100% 50%;
+    --sidebar-primary-foreground: 248 250 252;
+    --sidebar-accent: 226 232 240;
+    --sidebar-accent-foreground: 15 23 42;
+    --sidebar-border: 214 31 91;
+    --sidebar-ring: 210 100% 50%;
+  }
+
+  .dark {
+    /* Dark theme variables */
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 210 100% 50%;
+    --primary-foreground: 222.2 84% 4.9%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 75%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 50%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 210 100% 50%;
+    --sidebar-background: 15 23 42;
+    --sidebar-foreground: 248 250 252;
+    --sidebar-primary: 210 100% 50%;
+    --sidebar-primary-foreground: 15 23 42;
+    --sidebar-accent: 30 41 59;
+    --sidebar-accent-foreground: 248 250 252;
+    --sidebar-border: 51 65 85;
+    --sidebar-ring: 210 100% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Prevent horizontal scrolling */
+.no-horizontal-scroll {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* Mobile keyboard styles moved from chat-interface.tsx */
+body.keyboard-open .chat-container {
+  height: 100vh;
+}
+body.keyboard-open .chat-messages {
+  padding-bottom: 20px;
+}
+
+/* Optimized mobile input styles for better performance */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  .mobile-chat-input {
+    font-size: 16px !important;
+    transform: translateZ(0); /* Hardware acceleration */
+  }
+}
+@media screen and (max-width: 768px) {
+  .mobile-chat-input {
+    font-size: 16px !important;
+    -webkit-text-size-adjust: 100%;
+    transform: translateZ(0); /* Hardware acceleration */
+    will-change: contents; /* Optimize for content changes */
+  }
+}
+/* Markdown image styles for chat messages */
+.markdown-image-container {
+  display: block;
+  margin: 8px 0;
+  max-width: 100%;
+}
+
+.markdown-image-container img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease-in-out;
+}
+
+.markdown-image-container img:hover {
+  transform: scale(1.02);
+  cursor: pointer;
+}
+
+/* Ensure images don't break layout in mobile */
+@media (max-width: 768px) {
+  .markdown-image-container img {
+    max-height: 300px;
+    object-fit: contain;
+  }
+}
+
+/* Comprehensive performance optimizations for all form elements */
+input,
+textarea,
+select,
+.mobile-chat-input,
+textarea[class*="chat-input"],
+input[class*="chat-input"],
+[role="textbox"],
+[contenteditable="true"],
+/* Target all UI components */
+  input[class*="flex"],
+textarea[class*="flex"],
+/* Specific targeting for common patterns */
+  div[class*="input"]
+  input,
+div[class*="textarea"] textarea {
+  /* Critical performance optimizations */
+  transition: none !important;
+  transform: translateZ(0) !important;
+  -webkit-transform: translateZ(0) !important;
+  will-change: contents !important;
+  contain: layout style !important;
+  -webkit-backface-visibility: hidden !important;
+  backface-visibility: hidden !important;
+
+  /* Prevent reflows during typing */
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+
+  /* GPU acceleration hints */
+  -webkit-perspective: 1000 !important;
+  perspective: 1000 !important;
+}
+
+/* Special handling for focus states to prevent lag */
+input:focus,
+textarea:focus,
+[contenteditable="true"]:focus {
+  /* Keep minimal focus styles for performance */
+  outline-offset: 0 !important;
+  /* Prevent expensive box-shadow transitions */
+  box-shadow: none !important;
+}
+
+@supports (-webkit-touch-callout: none) {
+  .mobile-chat-input {
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+  }
+}
+
+/* Enhanced formatting for chat messages - high specificity to override color schemes */
+.rounded-2xl [data-text-type="action"],
+.message-bubble [data-text-type="action"],
+div[class*="bg-"] [data-text-type="action"] {
+  font-style: italic !important;
+  color: #94a3b8 !important; /* Consistent gray across all themes */
+  opacity: 0.9 !important;
+  font-weight: 400 !important;
+}
+
+.rounded-2xl [data-text-type="dialogue"],
+.message-bubble [data-text-type="dialogue"],
+div[class*="bg-"] [data-text-type="dialogue"] {
+  font-weight: 500 !important;
+  /* Keep original text color for dialogue */
+}
+
+.rounded-2xl [data-text-type="thought"],
+.message-bubble [data-text-type="thought"],
+div[class*="bg-"] [data-text-type="thought"] {
+  font-style: italic !important;
+  color: #64748b !important; /* Slightly darker gray for thoughts */
+  font-size: 0.875rem !important;
+  opacity: 0.8 !important;
+}
+
+/* Dark theme specific adjustments */
+.dark .rounded-2xl [data-text-type="action"],
+.dark .message-bubble [data-text-type="action"],
+.dark div[class*="bg-"] [data-text-type="action"] {
+  color: #94a3b8 !important; /* Lighter gray for dark mode */
+  opacity: 0.85 !important;
+}
+
+.dark .rounded-2xl [data-text-type="thought"],
+.dark .message-bubble [data-text-type="thought"],
+.dark div[class*="bg-"] [data-text-type="thought"] {
+  color: #94a3b8 !important;
+  opacity: 0.7 !important;
+}
