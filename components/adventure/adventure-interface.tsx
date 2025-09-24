@@ -338,26 +338,66 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
             </CardContent>
           </Card>
 
-          {/* Skills */}
+          {/* Status Panel (Player, Nature, Stats, Skill) */}
           <Card className="bg-muted/70 border-border shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center space-x-3">
-                <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-violet-600 rounded-lg flex items-center justify-center shadow-md">
-                  <Star className="w-4 h-4 text-black" />
+            <CardContent className="space-y-3 text-[9px] text-white/90">
+              {/* Player */}
+              <div className="flex items-center gap-3">
+                <span className="font-semibold">Player</span>
+                <div className="px-3 py-1 rounded-md bg-emerald-500/20 border border-emerald-400/30 text-emerald-300">
+                  Cha Yeon-woo
                 </div>
-                <span className="text-foreground font-semibold">Skill</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-1">
-              <div className="max-h-48 overflow-y-auto pr-1">
-                <ul className="space-y-1 text-[9px] leading-[14px] text-white/90">
-                  {SKILL_LIST.map((s) => (
-                    <li key={s.name} className="flex items-start justify-between">
-                      <span className="pr-2">{s.name}</span>
-                      <span className="text-white/90">({s.pct.toFixed(1)}%)</span>
-                    </li>
-                  ))}
-                </ul>
+              </div>
+
+              {/* Nature */}
+              <div className="flex items-center gap-3">
+                <span className="font-semibold">Nature</span>
+                <div className="px-3 py-1 rounded-md bg-muted/40 border border-white/10 text-white/90">
+                  Cold Blooded, Adamantine Physique
+                </div>
+              </div>
+
+              {/* Stat rows */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold">Strength</span>
+                  <div className="px-3 py-1 rounded-md bg-slate-800/40 border border-sky-500/20 text-white">
+                    235 <span className="text-sky-400">(+23)</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 justify-start">
+                  <span className="font-semibold">Agility</span>
+                  <div className="px-3 py-1 rounded-md bg-slate-800/40 border border-sky-500/20 text-white">
+                    245 <span className="text-sky-400">(+29)</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold">Health</span>
+                  <div className="px-3 py-1 rounded-md bg-slate-800/40 border border-sky-500/20 text-white">
+                    239 <span className="text-sky-400">(+14)</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold">Magic</span>
+                  <div className="px-3 py-1 rounded-md bg-slate-800/40 border border-sky-500/20 text-white">
+                    320 <span className="text-sky-400">(+22)</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Skill list */}
+              <div className="pt-1">
+                <span className="font-semibold">Skill</span>
+                <div className="mt-2 rounded-lg bg-slate-800/30 border border-white/10 p-3 max-h-48 overflow-y-auto">
+                  <ul className="space-y-1 leading-[14px]">
+                    {SKILL_LIST.map((s) => (
+                      <li key={s.name} className="flex items-start justify-between">
+                        <span className="pr-2">{s.name}</span>
+                        <span>({s.pct.toFixed(1)}%)</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -388,7 +428,7 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
                           {name ? (
                             <span title={name} aria-label={name}>{getItemEmoji(name)}</span>
                           ) : (
-                            <span className="text-muted-foreground/30">•</span>
+                            <span className="text-muted-foreground/30">��</span>
                           )}
                         </div>
                       ))}
