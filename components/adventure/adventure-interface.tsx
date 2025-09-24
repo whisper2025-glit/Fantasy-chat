@@ -227,8 +227,8 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
   ];
 
   return (
-    <div className="h-screen flex flex-col bg-background text-foreground">
-      <div className="flex-shrink-0 bg-card/95 backdrop-blur-xl border-b border-border px-6 py-4 z-30 shadow-xl">
+    <div className="h-screen flex flex-col bg-background text-foreground overflow-hidden">
+      <div className="flex-shrink-0 sticky top-0 bg-card/95 backdrop-blur-xl border-b border-border px-6 py-4 z-30 shadow-xl">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-6">
             <Button 
@@ -440,9 +440,9 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
         </button>
       </div>
 
-      <div className="flex-1 flex">
+      <div className="flex-1 min-h-0 flex">
         {/* Main Game Area */}
-        <div className="flex-1 flex flex-col bg-background">
+        <div className="flex-1 min-h-0 flex flex-col bg-background">
           <div className="flex-1 p-6 overflow-y-auto scroll-container scrollbar-thin" ref={scrollAreaRef}>
             <div className="space-y-4 max-w-4xl">
               {gameState.gameHistory.map((message) => (
