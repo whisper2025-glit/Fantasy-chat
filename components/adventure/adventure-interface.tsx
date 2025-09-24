@@ -96,10 +96,16 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
       return;
     }
 
-    const userAction = currentInput.trim();
+    const prefixMap: Record<TurnMode, string> = {
+      say: 'Say',
+      do: 'Do',
+      story: 'Story',
+      see: 'See',
+    };
+    const userAction = `${prefixMap[turnMode]}: ${currentInput.trim()}`;
     addMessage(userAction, 'user');
     setCurrentInput('');
-    
+
     setGameState(prev => ({ ...prev, isLoading: true }));
 
     try {
@@ -215,7 +221,7 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
       apple: '🍎',
       torch: '🔥',
       book: '📜',
-      scroll: '��',
+      scroll: '📜',
       armor: '🥋'
     };
     for (const k of Object.keys(EMOJI_MAP)) {
