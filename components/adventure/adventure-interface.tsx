@@ -50,6 +50,7 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
   const [currentInput, setCurrentInput] = useState('');
   const [apiKey, setApiKey] = useState('');
   const [showSettings, setShowSettings] = useState(false);
+  const [showComposer, setShowComposer] = useState(false);
   const [isInfoSidebarOpen, setIsInfoSidebarOpen] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
@@ -118,6 +119,7 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
       addMessage('Something went wrong. Please try again.', 'system');
     } finally {
       setGameState(prev => ({ ...prev, isLoading: false }));
+      setShowComposer(false);
     }
   };
 
@@ -493,32 +495,58 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
           </div>
 
           <div className="bg-card/95 backdrop-blur-xl border-t border-border p-3 shadow-xl">
-            <div className="max-w-4xl space-y-2">
-              <div className="flex space-x-3">
-                <div className="flex-1 relative">
-                  <Input
-                    placeholder="What would you like to do? (e.g., look around, examine door, take sword)"
-                    value={currentInput}
-                    onChange={(e) => setCurrentInput(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    disabled={gameState.isLoading}
-                    className="bg-muted/70 border-border text-foreground placeholder:text-muted-foreground pr-10 py-2 text-sm focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 transition-all"
-                  />
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                    <Badge variant="secondary" className="text-xs bg-gradient-to-r from-cyan-400/10 to-blue-500/10 text-cyan-300">
-                      Enter ↵
-                    </Badge>
+            <div className="max-w-4xl">
+              {showComposer ? (
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 relative">
+                    <Input
+                      placeholder="What would you like to do? (e.g., look around, examine door, take sword)"
+                      value={currentInput}
+                      onChange={(e) => setCurrentInput(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      disabled={gameState.isLoading}
+                      className="bg-muted/70 border-border text-foreground placeholder:text-muted-foreground pr-10 py-2 text-sm focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 transition-all"
+                    />
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                      <Badge variant="secondary" className="text-[10px] bg-gradient-to-r from-cyan-400/10 to-blue-500/10 text-cyan-300">
+                        Enter ↵
+                      </Badge>
+                    </div>
                   </div>
+                  <Button
+                    onClick={handleAction}
+                    disabled={!currentInput.trim() || gameState.isLoading}
+                    size="sm"
+                    className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-4"
+                  >
+                    <Send className="w-4 h-4" />
+                  </Button>
                 </div>
-                <Button
-                  onClick={handleAction}
-                  disabled={!currentInput.trim() || gameState.isLoading}
-                  size="sm"
-                  className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-4"
-                >
-                  <Send className="w-4 h-4" />
-                </Button>
-              </div>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <Button
+                    onClick={() => setShowComposer(true)}
+                    className="flex-1 h-10 bg-muted/60 hover:bg-muted text-foreground border border-white/10"
+                    variant="secondary"
+                  >
+                    TAKE A TURN
+                  </Button>
+                  <Button
+                    onClick={() => { setCurrentInput('continue'); setTimeout(() => handleAction(), 0); }}
+                    className="flex-1 h-10 bg-muted/60 hover:bg-muted text-foreground border border-white/10"
+                    variant="secondary"
+                  >
+                    CONTINUE
+                  </Button>
+                  <Button
+                    onClick={() => { setCurrentInput('retry'); setTimeout(() => handleAction(), 0); }}
+                    className="flex-1 h-10 bg-muted/60 hover:bg-muted text-foreground border border-white/10"
+                    variant="secondary"
+                  >
+                    RETRY
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         </div>
