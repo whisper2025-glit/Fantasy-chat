@@ -60,6 +60,25 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
   const [turnMode, setTurnMode] = useState<TurnMode>('say');
   const [isModeSliderOpen, setIsModeSliderOpen] = useState(false);
 
+  const MODES: TurnMode[] = ['say', 'do', 'story', 'see'];
+  const MODE_LABEL: Record<TurnMode, string> = {
+    say: 'Say',
+    do: 'Do',
+    story: 'Story',
+    see: 'See',
+  };
+  const MODE_PLACEHOLDER: Record<TurnMode, string> = {
+    say: 'What do you say?',
+    do: 'What do you do?',
+    story: 'Continue the story…',
+    see: 'What do you look at?',
+  };
+  const stepMode = (delta: number) => {
+    const idx = MODES.indexOf(turnMode);
+    const next = (idx + delta + MODES.length) % MODES.length;
+    setTurnMode(MODES[next]);
+  };
+
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
