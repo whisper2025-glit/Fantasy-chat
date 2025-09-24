@@ -56,22 +56,18 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
   const [isInfoSidebarOpen, setIsInfoSidebarOpen] = useState(false);
 
   // Turn composer behavior
-  type TurnMode = 'say' | 'do' | 'story' | 'see';
-  const [turnMode, setTurnMode] = useState<TurnMode>('say');
+  type TurnMode = 'actions' | 'story';
+  const [turnMode, setTurnMode] = useState<TurnMode>('actions');
   const [isModeSliderOpen, setIsModeSliderOpen] = useState(false);
 
-  const MODES: TurnMode[] = ['say', 'do', 'story', 'see'];
+  const MODES: TurnMode[] = ['actions', 'story'];
   const MODE_LABEL: Record<TurnMode, string> = {
-    say: 'Say',
-    do: 'Do',
+    actions: 'Actions',
     story: 'Story',
-    see: 'See',
   };
   const MODE_PLACEHOLDER: Record<TurnMode, string> = {
-    say: 'What do you say?',
-    do: 'What do you do?',
+    actions: 'What do you do or say?',
     story: 'Continue the story…',
-    see: 'What do you look at?',
   };
   const stepMode = (delta: number) => {
     const idx = MODES.indexOf(turnMode);
