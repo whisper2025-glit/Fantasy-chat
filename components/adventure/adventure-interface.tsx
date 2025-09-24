@@ -186,6 +186,34 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
     }
   };
 
+  const getItemEmoji = (name: string) => {
+    const key = name.toLowerCase();
+    const EMOJI_MAP: Record<string, string> = {
+      sword: '🗡️',
+      shield: '🛡️',
+      potion: '🧪',
+      pickaxe: '⛏️',
+      ore: '⛏️',
+      key: '🗝️',
+      gold: '🪙',
+      coin: '🪙',
+      gem: '💎',
+      map: '🗺️',
+      bow: '🏹',
+      axe: '🪓',
+      food: '🍖',
+      apple: '🍎',
+      torch: '🔥',
+      book: '📜',
+      scroll: '📜',
+      armor: '🥋'
+    };
+    for (const k of Object.keys(EMOJI_MAP)) {
+      if (key.includes(k)) return EMOJI_MAP[k];
+    }
+    return '❔';
+  };
+
   return (
     <div className="h-screen flex flex-col bg-background text-foreground">
       <div className="flex-shrink-0 bg-card/95 backdrop-blur-xl border-b border-border px-6 py-4 z-30 shadow-xl">
@@ -342,19 +370,27 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-2 max-h-48 overflow-y-auto scrollbar-thin">
-                {Object.entries(gameState.player.inventory).map(([item, count]) => (
-                  <div key={item} className="flex justify-between items-center p-2 rounded-lg bg-muted/40 hover:bg-muted/60 transition-colors">
-                    <span className="text-xs text-foreground capitalize">{item.replace(/([A-Z])/g, ' $1')}</span>
-                    <Badge 
-                      variant="secondary" 
-                      className="bg-gradient-to-r from-cyan-400/20 to-blue-500/20 text-cyan-300 border-cyan-500/30 text-xs"
-                    >
-                      {count}
-                    </Badge>
+              {(() => {
+                const items = Object.entries(gameState.player.inventory)
+                  .flatMap(([name, count]) => Array.from({ length: count }, () => name));
+                const slots = Array.from({ length: 20 }, (_, i) => items[i] ?? null);
+                return (
+                  <div className="grid grid-cols-4 gap-2">
+                    {slots.map((name, i) => (
+                      <div
+                        key={i}
+                        className={`relative aspect-square rounded-md border border-border ${name ? 'bg-muted/60 hover:bg-muted' : 'bg-muted/30'} flex items-center justify-center text-lg select-none transition-colors`}
+                      >
+                        {name ? (
+                          <span title={name} aria-label={name}>{getItemEmoji(name)}</span>
+                        ) : (
+                          <span className="text-muted-foreground/30">•</span>
+                        )}
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                );
+              })()}
             </CardContent>
           </Card>
         </div>
