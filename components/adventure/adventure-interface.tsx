@@ -21,30 +21,16 @@ import {
   GameMessage
 } from '@/lib/adventure-types';
 import { openRouterService } from '@/lib/openrouter-service';
-import { ETHORIA_WORLD, STARTING_PLAYER, STARTING_LOCATION } from '@/lib/ethoria-data';
+import { storyGenerator, StoryContext } from '@/lib/story-generator';
+import { StorySetupCoordinator } from '@/components/story-setup/story-setup-coordinator';
 
 interface AdventureInterfaceProps {
   onBack: () => void;
 }
 
 export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
-  const [gameState, setGameState] = useState<GameState>({
-    player: STARTING_PLAYER,
-    world: ETHORIA_WORLD.description,
-    kingdom: ETHORIA_WORLD.kingdoms.Valdor.description,
-    town: ETHORIA_WORLD.kingdoms.Valdor.towns.Ravenhurst.description,
-    character_name: STARTING_PLAYER.name,
-    character_description: ETHORIA_WORLD.kingdoms.Valdor.towns.Ravenhurst.npcs["Elara Brightshield"].description,
-    location: STARTING_LOCATION.area,
-    completedQuests: [],
-    gameHistory: [{
-      id: '1',
-      type: 'system',
-      content: ETHORIA_WORLD.startingScenario,
-      timestamp: new Date()
-    }],
-    isLoading: false
-  });
+  const [storyContext, setStoryContext] = useState<StoryContext | null>(null);
+  const [gameState, setGameState] = useState<GameState | null>(null);
   const [currentInput, setCurrentInput] = useState('');
   const [apiKey, setApiKey] = useState('');
   const [showSettings, setShowSettings] = useState(false);
@@ -99,8 +85,47 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
     }));
   };
 
+  const handleStoryGenerated = (context: StoryContext) => {
+    setStoryContext(context);
+    
+    // Initialize game state with the generated story
+    const initialGameState: GameState = {
+      player: {
+        name: context.setup.characterName,
+        health: 100,
+        maxHealth: 100,
+        level: 1,
+        exp: 0,
+        expToLevel: 100,
+        position: [0, 0] as [number, number],
+        inventory: {},
+        skills: {
+          combat: 1,
+          stealth: 1,
+          magic: 1
+        }
+      },
+      world: context.worldSetting,
+      kingdom: `The ${context.setup.genre} realm`,
+      town: "Your current location",
+      character_name: context.setup.characterName,
+      character_description: `A ${context.setup.age}-year-old ${context.setup.gender} in a ${context.setup.genre} adventure`,
+      location: "Your adventure begins here",
+      completedQuests: [],
+      gameHistory: [{
+        id: '1',
+        type: 'system',
+        content: context.startingScenario,
+        timestamp: new Date()
+      }],
+      isLoading: false
+    };
+    
+    setGameState(initialGameState);
+  };
+
   const handleAction = async () => {
-    if (!currentInput.trim()) return;
+    if (!currentInput.trim() || !gameState || !storyContext) return;
 
     const prefixMap: Record<TurnMode, string> = {
       actions: 'Actions',
@@ -110,12 +135,12 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
     addMessage(userAction, 'user');
     setCurrentInput('');
 
-    setGameState(prev => ({ ...prev, isLoading: true }));
+    setGameState(prev => prev ? { ...prev, isLoading: true } : prev);
 
     try {
-      const response = await openRouterService.generateAdventureResponse(
-        userAction,
-        gameState,
+      const response = await storyGenerator.generateAdventureResponse(
+        currentInput.trim(),
+        storyContext,
         gameState.gameHistory.map(msg => ({
           role: msg.type === 'user' ? 'user' : 'assistant',
           content: msg.content
@@ -123,26 +148,27 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
       );
 
       addMessage(response, 'game');
-
       updateGameState(userAction);
 
     } catch (error) {
       console.error('Adventure error:', error);
       addMessage('Something went wrong. Please try again.', 'system');
     } finally {
-      setGameState(prev => ({ ...prev, isLoading: false }));
+      setGameState(prev => prev ? { ...prev, isLoading: false } : prev);
       setShowComposer(false);
     }
   };
 
   const updateGameState = (action: string) => {
+    if (!gameState) return;
+    
     const lowerAction = action.toLowerCase();
     
     if (lowerAction.includes('take') || lowerAction.includes('pick up')) {
       const itemMatch = action.match(/take|pick up (.*)/i);
       if (itemMatch) {
         const item = itemMatch[1].toLowerCase();
-        setGameState(prev => ({
+        setGameState(prev => prev ? ({
           ...prev,
           player: {
             ...prev.player,
@@ -151,12 +177,14 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
               [item]: (prev.player.inventory[item] || 0) + 1
             }
           }
-        }));
+        }) : prev);
       }
     }
     
     if (lowerAction.includes('fight') || lowerAction.includes('attack')) {
       setGameState(prev => {
+        if (!prev) return prev;
+        
         const damage = Math.floor(Math.random() * 20 + 5);
         const expGain = Math.floor(Math.random() * 25 + 10);
         const newHealth = Math.max(10, prev.player.health - damage);
@@ -183,13 +211,13 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
     }
 
     if (lowerAction.includes('heal') || lowerAction.includes('rest')) {
-      setGameState(prev => ({
+      setGameState(prev => prev ? ({
         ...prev,
         player: {
           ...prev.player,
           health: Math.min(prev.player.maxHealth, prev.player.health + 20)
         }
-      }));
+      }) : prev);
     }
   };
 
@@ -239,6 +267,28 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
     { name: 'Shunpo', pct: 39.1 },
     { name: 'Magic Circulation', pct: 18.2 },
   ];
+
+  // Show story setup if no story context exists yet
+  if (!storyContext) {
+    return (
+      <StorySetupCoordinator
+        onStoryGenerated={handleStoryGenerated}
+        onBack={onBack}
+      />
+    );
+  }
+
+  // Show loading or error state if gameState is not ready
+  if (!gameState) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-black text-white">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
+          <p>Initializing your adventure...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen flex flex-col bg-background text-foreground overflow-hidden">
