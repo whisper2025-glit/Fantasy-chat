@@ -529,14 +529,7 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
                     {/* Mode pill and slider */}
                     <div className="absolute -top-12 left-0">
                       <div className="flex items-center gap-2 bg-card/90 border border-border rounded-xl px-2 py-1 shadow-md">
-                        <button
-                          aria-label="Close"
-                          onClick={() => { setShowComposer(false); setIsModeSliderOpen(false); }}
-                          className="p-1 rounded-md hover:bg-muted/60"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                        {isModeSliderOpen ? (
+                          {isModeSliderOpen ? (
                           <div className="flex items-center gap-2">
                             {MODES.map((m) => (
                               <button
