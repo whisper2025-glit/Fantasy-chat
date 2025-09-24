@@ -238,15 +238,7 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
             >
               ← Back
             </Button>
-            <div className="flex items-center space-x-3">
-              <div className="relative w-10 h-10 flex items-center justify-center">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg"></div>
-                <div className="relative z-10 flex items-center justify-center w-full h-full">
-                  <Sword className="w-6 h-6 text-black" />
-                </div>
-                <div className="absolute -top-1 -right-1 w-2 h-2 bg-blue-300 rounded-full opacity-70"></div>
-                <div className="absolute -bottom-1 -left-1 w-1.5 h-1.5 bg-blue-400 rounded-full opacity-60"></div>
-              </div>
+            <div className="flex items-center">
               <h1 className="text-white font-semibold text-lg">Ethoria Adventure</h1>
             </div>
           </div>
@@ -344,9 +336,7 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
               {/* Player */}
               <div className="flex items-center gap-3">
                 <span className="font-semibold">Player</span>
-                <div className="px-3 py-1 rounded-md bg-emerald-500/20 border border-emerald-400/30 text-emerald-300">
-                  Cha Yeon-woo
-                </div>
+                <span className="text-white/90">Cha Yeon-woo</span>
               </div>
 
               {/* Nature */}
