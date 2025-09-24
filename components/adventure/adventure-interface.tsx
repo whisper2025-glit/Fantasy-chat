@@ -599,7 +599,7 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
               ) : (
                 <div className="flex items-center gap-3">
                   <Button
-                    onClick={() => { setTurnMode('say'); setIsModeSliderOpen(false); setShowComposer(true); }}
+                    onClick={() => { setTurnMode('actions'); setIsModeSliderOpen(false); setShowComposer(true); }}
                     className="flex-1 h-10 bg-muted/60 hover:bg-muted text-foreground border border-white/10"
                     variant="secondary"
                   >
