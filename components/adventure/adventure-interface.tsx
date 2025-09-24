@@ -521,10 +521,10 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
           </div>
 
           <div className="bg-card/95 backdrop-blur-xl border-t border-border p-3 shadow-xl">
-            <div className="max-w-4xl">
+            <div className="max-w-6xl w-full">
               {showComposer ? (
                 <div className="flex items-end gap-3">
-                  <div className="flex-1 relative">
+                  <div className="flex-1 relative w-full">
                     {/* Mode pill and slider */}
                     <div className="absolute -top-12 left-0">
                       <div className="flex items-center gap-2 bg-card/90 border border-border rounded-xl px-2 py-1 shadow-md">
@@ -578,22 +578,22 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
                       onChange={(e) => setCurrentInput(e.target.value)}
                       onKeyDown={handleKeyPress}
                       disabled={gameState.isLoading}
-                      className="bg-muted/70 border-border text-foreground placeholder:text-muted-foreground pr-14 py-2 text-sm focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 transition-all min-h-[56px]"
+                      className="bg-muted/70 border-border text-foreground placeholder:text-muted-foreground pr-20 py-3 text-sm focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 transition-all min-h-[64px] w-full"
                     />
-                    <div className="absolute right-3 bottom-2">
+                    <div className="absolute right-3 bottom-2 flex items-center gap-2">
                       <Badge variant="secondary" className="text-[10px] bg-gradient-to-r from-cyan-400/10 to-blue-500/10 text-cyan-300">
                         Enter ↵
                       </Badge>
+                      <button
+                        onClick={handleAction}
+                        disabled={!currentInput.trim() || gameState.isLoading}
+                        aria-label="Send"
+                        className="flex items-center justify-center w-9 h-9 rounded-md bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg transition-all duration-200"
+                      >
+                        <Send className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
-                  <Button
-                    onClick={handleAction}
-                    disabled={!currentInput.trim() || gameState.isLoading}
-                    size="sm"
-                    className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-4"
-                  >
-                    <Send className="w-4 h-4" />
-                  </Button>
                 </div>
               ) : (
                 <div className="flex items-center gap-3">
