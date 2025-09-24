@@ -238,9 +238,7 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
             >
               ← Back
             </Button>
-            <div className="flex items-center">
-              <h1 className="text-white font-semibold text-lg">Ethoria Adventure</h1>
-            </div>
+            <div className="flex items-center" />
           </div>
           <Button 
             onClick={() => setShowSettings(!showSettings)} 
