@@ -4,24 +4,22 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-// Using regular div for scrolling since ScrollArea component is not available
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { 
   Sword, 
-  Shield, 
   Heart, 
   Star, 
   Backpack, 
   Map, 
   Settings,
   Send,
-  Loader2
+  Loader2,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 
 import { 
   GameState, 
-  Player, 
   GameMessage
 } from '@/lib/adventure-types';
 import { openRouterService } from '@/lib/openrouter-service';
@@ -52,17 +50,17 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
   const [currentInput, setCurrentInput] = useState('');
   const [apiKey, setApiKey] = useState('');
   const [showSettings, setShowSettings] = useState(false);
+  const [showComposer, setShowComposer] = useState(false);
+  const [isInfoSidebarOpen, setIsInfoSidebarOpen] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Scroll to bottom when new messages are added
     if (scrollAreaRef.current) {
       scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
     }
   }, [gameState.gameHistory]);
 
   useEffect(() => {
-    // Set API key if available
     if (apiKey) {
       openRouterService.setApiKey(apiKey);
     }
@@ -97,14 +95,12 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
     setGameState(prev => ({ ...prev, isLoading: true }));
 
     try {
-      // Check content safety
       const isSafe = await openRouterService.checkContentSafety(userAction);
       if (!isSafe) {
         addMessage('This action was blocked for safety reasons. Please try something else.', 'system');
         return;
       }
 
-      // Generate AI response using the repository's approach
       const response = await openRouterService.generateAdventureResponse(
         userAction, 
         gameState,
@@ -116,7 +112,6 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
 
       addMessage(response, 'game');
 
-      // Real game mechanics based on repository logic
       updateGameState(userAction);
 
     } catch (error) {
@@ -124,13 +119,13 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
       addMessage('Something went wrong. Please try again.', 'system');
     } finally {
       setGameState(prev => ({ ...prev, isLoading: false }));
+      setShowComposer(false);
     }
   };
 
   const updateGameState = (action: string) => {
     const lowerAction = action.toLowerCase();
     
-    // Item pickup logic (from repository)
     if (lowerAction.includes('take') || lowerAction.includes('pick up')) {
       const itemMatch = action.match(/take|pick up (.*)/i);
       if (itemMatch) {
@@ -148,7 +143,6 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
       }
     }
     
-    // Combat logic (from repository)
     if (lowerAction.includes('fight') || lowerAction.includes('attack')) {
       setGameState(prev => {
         const damage = Math.floor(Math.random() * 20 + 5);
@@ -156,7 +150,6 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
         const newHealth = Math.max(10, prev.player.health - damage);
         const newExp = prev.player.exp + expGain;
         
-        // Level up check
         let newLevel = prev.player.level;
         let expToLevel = prev.player.expToLevel;
         if (newExp >= expToLevel) {
@@ -177,7 +170,6 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
       });
     }
 
-    // Healing logic
     if (lowerAction.includes('heal') || lowerAction.includes('rest')) {
       setGameState(prev => ({
         ...prev,
@@ -196,10 +188,49 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
     }
   };
 
+  const getItemEmoji = (name: string) => {
+    const key = name.toLowerCase();
+    const EMOJI_MAP: Record<string, string> = {
+      sword: '🗡️',
+      shield: '🛡️',
+      potion: '🧪',
+      pickaxe: '⛏️',
+      ore: '⛏️',
+      key: '🗝️',
+      gold: '🪙',
+      coin: '🪙',
+      gem: '💎',
+      map: '🗺️',
+      bow: '🏹',
+      axe: '🪓',
+      food: '🍖',
+      apple: '🍎',
+      torch: '🔥',
+      book: '📜',
+      scroll: '📜',
+      armor: '🥋'
+    };
+    for (const k of Object.keys(EMOJI_MAP)) {
+      if (key.includes(k)) return EMOJI_MAP[k];
+    }
+    return '❔';
+  };
+
+  const SKILL_LIST: { name: string; pct: number }[] = [
+    { name: 'Dragon eyes', pct: 25.1 },
+    { name: 'Heightened Senses', pct: 43.2 },
+    { name: 'Foresight', pct: 1.0 },
+    { name: 'Physical Resistance', pct: 30.1 },
+    { name: 'Combat Will', pct: 25.5 },
+    { name: "Bathory's Vampiric Dagger", pct: 15.5 },
+    { name: 'Flame Infusion', pct: 52.1 },
+    { name: 'Shunpo', pct: 39.1 },
+    { name: 'Magic Circulation', pct: 18.2 },
+  ];
+
   return (
-    <div className="h-screen flex flex-col bg-background text-foreground">
-      {/* Enhanced Header with Gradient */}
-      <div className="flex-shrink-0 bg-card/95 backdrop-blur-xl border-b border-border px-6 py-4 z-30 shadow-xl">
+    <div className="h-screen flex flex-col bg-background text-foreground overflow-hidden">
+      <div className="flex-shrink-0 sticky top-0 bg-card/95 backdrop-blur-xl border-b border-border px-6 py-4 z-30 shadow-xl">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-6">
             <Button 
@@ -209,17 +240,7 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
             >
               ← Back
             </Button>
-            <div className="flex items-center space-x-3">
-              <div className="relative w-10 h-10 flex items-center justify-center">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg"></div>
-                <div className="relative z-10 flex items-center justify-center w-full h-full">
-                  <Sword className="w-6 h-6 text-black" />
-                </div>
-                <div className="absolute -top-1 -right-1 w-2 h-2 bg-blue-300 rounded-full opacity-70"></div>
-                <div className="absolute -bottom-1 -left-1 w-1.5 h-1.5 bg-blue-400 rounded-full opacity-60"></div>
-              </div>
-              <h1 className="text-white font-semibold text-lg">Ethoria Adventure</h1>
-            </div>
+            <div className="flex items-center" />
           </div>
           <Button 
             onClick={() => setShowSettings(!showSettings)} 
@@ -231,7 +252,6 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
         </div>
       </div>
 
-      {/* Enhanced Settings Panel */}
       {showSettings && (
         <div className="bg-card/95 backdrop-blur-xl border-b border-border p-6 shadow-lg">
           <div className="max-w-2xl">
@@ -253,7 +273,7 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
                 />
                 <div className="mt-2 space-y-1">
                   <p className="text-xs text-muted-foreground">
-                    Get your free API key at{" "}
+                    Get your free API key at{' '}
                     <a 
                       href="https://openrouter.ai" 
                       target="_blank" 
@@ -276,48 +296,10 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
         </div>
       )}
 
-      <div className="flex-1 flex">
-        {/* Enhanced Sidebar with Player Stats */}
-        <div className="w-80 bg-card/95 backdrop-blur-xl border-r border-border shadow-xl p-6 space-y-6">
-          {/* Enhanced Player Info Card */}
-          <Card className="bg-muted/70 border-border shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm flex items-center space-x-3">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md">
-                  <Sword className="w-4 h-4 text-black" />
-                </div>
-                <div>
-                  <span className="text-foreground font-semibold">{gameState.player.name}</span>
-                  <div className="text-xs text-muted-foreground">Warrior of Valdor</div>
-                </div>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">Level {gameState.player.level}</span>
-                <Badge variant="outline" className="bg-gradient-to-r from-cyan-400/10 to-blue-500/10 border-blue-500/30 text-blue-300">
-                  {gameState.player.exp}/{gameState.player.expToLevel} XP
-                </Badge>
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs">
-                  <div className="flex items-center space-x-2">
-                    <Heart className="w-3 h-3 text-red-400" />
-                    <span className="text-muted-foreground">Health</span>
-                  </div>
-                  <span className="text-foreground font-medium">{gameState.player.health}/{gameState.player.maxHealth}</span>
-                </div>
-                <div className="w-full bg-muted rounded-full h-2.5 shadow-inner">
-                  <div 
-                    className="bg-gradient-to-r from-red-500 to-red-400 h-2.5 rounded-full shadow-sm transition-all duration-500" 
-                    style={{ width: `${(gameState.player.health / gameState.player.maxHealth) * 100}%` }}
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Enhanced World Info */}
+      {/* Slide-out Info Sidebar: Current Location, Skills, Inventory */}
+      <div className={`fixed top-0 left-0 h-full overflow-y-auto w-72 bg-card/95 backdrop-blur-xl border-r border-border transform transition-transform duration-300 z-40 shadow-2xl ${isInfoSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="p-6 space-y-6">
+          {/* Current Location */}
           <Card className="bg-muted/70 border-border shadow-lg hover:shadow-xl transition-shadow duration-300">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm flex items-center space-x-3">
@@ -348,40 +330,69 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
             </CardContent>
           </Card>
 
-          {/* Enhanced Skills */}
+          {/* Status Panel (Player, Nature, Stats, Skill) */}
           <Card className="bg-muted/70 border-border shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm flex items-center space-x-3">
-                <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-violet-600 rounded-lg flex items-center justify-center shadow-md">
-                  <Star className="w-4 h-4 text-black" />
+            <CardContent className="space-y-3 text-[9px] text-white/90">
+              {/* Player */}
+              <div className="flex items-center gap-3">
+                <span className="font-semibold">Player</span>
+                <span className="text-white/90">Cha Yeon-woo</span>
+              </div>
+
+              {/* Nature */}
+              <div className="flex items-center gap-3">
+                <span className="font-semibold">Nature</span>
+                <div className="px-3 py-1 rounded-md bg-muted/40 border border-white/10 text-white/90">
+                  Cold Blooded, Adamantine Physique
                 </div>
-                <span className="text-foreground font-semibold">Skills</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {Object.entries(gameState.player.skills).map(([skill, level]) => (
-                <div key={skill} className="space-y-1">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-muted-foreground capitalize">{skill}</span>
-                    <div className="flex items-center space-x-1">
-                      {Array.from({ length: 5 }, (_, i) => (
-                        <Star 
-                          key={i} 
-                          className={`w-3 h-3 ${
-                            i < level 
-                              ? "fill-yellow-400 text-yellow-400" 
-                              : "text-muted-foreground/30"
-                          } transition-colors`} 
-                        />
-                      ))}
-                    </div>
+              </div>
+
+              {/* Stat rows */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold">Strength</span>
+                  <div className="px-3 py-1 rounded-md bg-slate-800/40 border border-sky-500/20 text-white">
+                    235 <span className="text-sky-400">(+23)</span>
                   </div>
                 </div>
-              ))}
+                <div className="flex items-center gap-2 justify-start">
+                  <span className="font-semibold">Agility</span>
+                  <div className="px-3 py-1 rounded-md bg-slate-800/40 border border-sky-500/20 text-white">
+                    245 <span className="text-sky-400">(+29)</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold">Health</span>
+                  <div className="px-3 py-1 rounded-md bg-slate-800/40 border border-sky-500/20 text-white">
+                    239 <span className="text-sky-400">(+14)</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold">Magic</span>
+                  <div className="px-3 py-1 rounded-md bg-slate-800/40 border border-sky-500/20 text-white">
+                    320 <span className="text-sky-400">(+22)</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Skill list */}
+              <div className="pt-1">
+                <span className="font-semibold">Skill</span>
+                <div className="mt-2 rounded-lg bg-slate-800/30 border border-white/10 p-3 max-h-48 overflow-y-auto">
+                  <ul className="space-y-1 leading-[14px]">
+                    {SKILL_LIST.map((s) => (
+                      <li key={s.name} className="flex items-start justify-between">
+                        <span className="pr-2">{s.name}</span>
+                        <span>({s.pct.toFixed(1)}%)</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
-          {/* Enhanced Inventory */}
+          {/* Inventory */}
           <Card className="bg-muted/70 border-border shadow-lg hover:shadow-xl transition-shadow duration-300">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm flex items-center space-x-3">
@@ -392,26 +403,48 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-2 max-h-48 overflow-y-auto scrollbar-thin">
-                {Object.entries(gameState.player.inventory).map(([item, count]) => (
-                  <div key={item} className="flex justify-between items-center p-2 rounded-lg bg-muted/40 hover:bg-muted/60 transition-colors">
-                    <span className="text-xs text-foreground capitalize">{item.replace(/([A-Z])/g, ' $1')}</span>
-                    <Badge 
-                      variant="secondary" 
-                      className="bg-gradient-to-r from-cyan-400/20 to-blue-500/20 text-cyan-300 border-cyan-500/30 text-xs"
-                    >
-                      {count}
-                    </Badge>
+              {(() => {
+                const items = Object.entries(gameState.player.inventory)
+                  .flatMap(([name, count]) => Array.from({ length: count }, () => name));
+                const slots = Array.from({ length: 20 }, (_, i) => items[i] ?? null);
+                return (
+                  <div className="max-h-48 overflow-y-auto pr-1 scrollbar-thin">
+                    <div className="grid grid-cols-4 gap-2">
+                      {slots.map((name, i) => (
+                        <div
+                          key={i}
+                          className={`relative aspect-square rounded-md border border-border ${name ? 'bg-muted/60 hover:bg-muted' : 'bg-muted/30'} flex items-center justify-center text-lg select-none transition-colors`}
+                        >
+                          {name ? (
+                            <span title={name} aria-label={name}>{getItemEmoji(name)}</span>
+                          ) : (
+                            <span className="text-muted-foreground/30">��</span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                ))}
-              </div>
+                );
+              })()}
             </CardContent>
           </Card>
         </div>
+      </div>
 
-        {/* Enhanced Main Game Area */}
-        <div className="flex-1 flex flex-col bg-background">
-          {/* Game History with Enhanced Styling */}
+      {/* Edge toggle button that hugs the left screen edge or drawer edge */}
+      <div className={`fixed top-1/2 transform -translate-y-1/2 z-50 ${isInfoSidebarOpen ? 'left-72' : 'left-0'}`}>
+        <button
+          aria-label={isInfoSidebarOpen ? 'Close sidebar' : 'Open sidebar'}
+          onClick={() => setIsInfoSidebarOpen(v => !v)}
+          className="bg-card/90 backdrop-blur rounded-r-lg p-1 hover:bg-muted/80 transition-colors shadow-md outline-none focus:outline-none focus:ring-0 active:scale-95"
+        >
+          {isInfoSidebarOpen ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+        </button>
+      </div>
+
+      <div className="flex-1 min-h-0 flex">
+        {/* Main Game Area */}
+        <div className="flex-1 min-h-0 flex flex-col bg-background">
           <div className="flex-1 p-6 overflow-y-auto scroll-container scrollbar-thin" ref={scrollAreaRef}>
             <div className="space-y-4 max-w-4xl">
               {gameState.gameHistory.map((message) => (
@@ -461,46 +494,59 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
             </div>
           </div>
 
-          {/* Enhanced Input Area */}
-          <div className="bg-card/95 backdrop-blur-xl border-t border-border p-6 shadow-xl">
-            <div className="max-w-4xl space-y-4">
-              <div className="flex space-x-3">
-                <div className="flex-1 relative">
-                  <Input
-                    placeholder="What would you like to do? (e.g., look around, examine door, take sword)"
-                    value={currentInput}
-                    onChange={(e) => setCurrentInput(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    disabled={gameState.isLoading}
-                    className="bg-muted/70 border-border text-foreground placeholder:text-muted-foreground pr-12 py-3 text-sm focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
-                  />
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                    <Badge variant="secondary" className="text-xs bg-gradient-to-r from-cyan-400/10 to-blue-500/10 text-cyan-300">
-                      Enter ↵
-                    </Badge>
+          <div className="bg-card/95 backdrop-blur-xl border-t border-border p-3 shadow-xl">
+            <div className="max-w-4xl">
+              {showComposer ? (
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 relative">
+                    <Input
+                      placeholder="What would you like to do? (e.g., look around, examine door, take sword)"
+                      value={currentInput}
+                      onChange={(e) => setCurrentInput(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      disabled={gameState.isLoading}
+                      className="bg-muted/70 border-border text-foreground placeholder:text-muted-foreground pr-10 py-2 text-sm focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 transition-all"
+                    />
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                      <Badge variant="secondary" className="text-[10px] bg-gradient-to-r from-cyan-400/10 to-blue-500/10 text-cyan-300">
+                        Enter ↵
+                      </Badge>
+                    </div>
                   </div>
-                </div>
-                <Button 
-                  onClick={handleAction} 
-                  disabled={!currentInput.trim() || gameState.isLoading}
-                  className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-6"
-                >
-                  <Send className="w-4 h-4" />
-                </Button>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {['look around', 'examine', 'take item', 'go north', 'attack', 'inventory', 'help'].map((action) => (
                   <Button
-                    key={action}
-                    variant="ghost"
+                    onClick={handleAction}
+                    disabled={!currentInput.trim() || gameState.isLoading}
                     size="sm"
-                    onClick={() => setCurrentInput(action)}
-                    className="text-xs text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
+                    className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-4"
                   >
-                    {action}
+                    <Send className="w-4 h-4" />
                   </Button>
-                ))}
-              </div>
+                </div>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <Button
+                    onClick={() => setShowComposer(true)}
+                    className="flex-1 h-10 bg-muted/60 hover:bg-muted text-foreground border border-white/10"
+                    variant="secondary"
+                  >
+                    TAKE A TURN
+                  </Button>
+                  <Button
+                    onClick={() => { setCurrentInput('continue'); setTimeout(() => handleAction(), 0); }}
+                    className="flex-1 h-10 bg-muted/60 hover:bg-muted text-foreground border border-white/10"
+                    variant="secondary"
+                  >
+                    CONTINUE
+                  </Button>
+                  <Button
+                    onClick={() => { setCurrentInput('retry'); setTimeout(() => handleAction(), 0); }}
+                    className="flex-1 h-10 bg-muted/60 hover:bg-muted text-foreground border border-white/10"
+                    variant="secondary"
+                  >
+                    RETRY
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         </div>
