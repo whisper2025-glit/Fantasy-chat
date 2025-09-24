@@ -477,7 +477,7 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
                 <div key={message.id} className="animate-fadeIn">
                   {message.type === 'user' ? (
                     <div className="w-full">
-                      <p className="border-l-2 border-blue-500/40 pl-3 text-base leading-relaxed whitespace-pre-wrap">
+                      <p className="border-l-2 border-blue-500/40 pl-3 text-base leading-relaxed whitespace-pre-wrap text-muted-foreground italic">
                         {message.content.replace(/^(Actions|Story)\s*:\s*/i, '')}
                       </p>
                     </div>
