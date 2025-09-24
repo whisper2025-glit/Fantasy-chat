@@ -214,6 +214,18 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
     return '❔';
   };
 
+  const SKILL_LIST: { name: string; pct: number }[] = [
+    { name: 'Dragon eyes', pct: 25.1 },
+    { name: 'Heightened Senses', pct: 43.2 },
+    { name: 'Foresight', pct: 1.0 },
+    { name: 'Physical Resistance', pct: 30.1 },
+    { name: 'Combat Will', pct: 25.5 },
+    { name: "Bathory's Vampiric Dagger", pct: 15.5 },
+    { name: 'Flame Infusion', pct: 52.1 },
+    { name: 'Shunpo', pct: 39.1 },
+    { name: 'Magic Circulation', pct: 18.2 },
+  ];
+
   return (
     <div className="h-screen flex flex-col bg-background text-foreground">
       <div className="flex-shrink-0 bg-card/95 backdrop-blur-xl border-b border-border px-6 py-4 z-30 shadow-xl">
@@ -328,34 +340,25 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
 
           {/* Skills */}
           <Card className="bg-muted/70 border-border shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-2">
               <CardTitle className="text-sm flex items-center space-x-3">
                 <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-violet-600 rounded-lg flex items-center justify-center shadow-md">
                   <Star className="w-4 h-4 text-black" />
                 </div>
-                <span className="text-foreground font-semibold">Skills</span>
+                <span className="text-foreground font-semibold">Skill</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
-              {Object.entries(gameState.player.skills).map(([skill, level]) => (
-                <div key={skill} className="space-y-1">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-muted-foreground capitalize">{skill}</span>
-                    <div className="flex items-center space-x-1">
-                      {Array.from({ length: 5 }, (_, i) => (
-                        <Star 
-                          key={i} 
-                          className={`w-3 h-3 ${
-                            i < (level as number)
-                              ? 'fill-yellow-400 text-yellow-400' 
-                              : 'text-muted-foreground/30'
-                          } transition-colors`} 
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              ))}
+            <CardContent className="pt-1">
+              <div className="max-h-48 overflow-y-auto pr-1">
+                <ul className="space-y-1 text-[9px] leading-[14px] text-white/90">
+                  {SKILL_LIST.map((s) => (
+                    <li key={s.name} className="flex items-start justify-between">
+                      <span className="pr-2">{s.name}</span>
+                      <span className="text-white/90">({s.pct.toFixed(1)}%)</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </CardContent>
           </Card>
 
