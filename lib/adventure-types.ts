@@ -19,6 +19,10 @@ export interface Player {
 export interface GameState {
   player: Player;
   world: string;
+  kingdom: string;
+  town: string;
+  character_name: string;
+  character_description: string;
   location: string;
   currentQuest?: Quest;
   completedQuests: Quest[];
@@ -51,37 +55,4 @@ export interface Item {
   effects?: { [key: string]: number };
 }
 
-export const INITIAL_PLAYER: Player = {
-  name: 'Adventurer',
-  health: 100,
-  maxHealth: 100,
-  level: 1,
-  exp: 0,
-  expToLevel: 100,
-  position: [0, 0],
-  inventory: {
-    'cloth pants': 1,
-    'cloth shirt': 1,
-    'goggles': 1,
-    'leather journal': 1,
-    'gold': 5
-  },
-  skills: {
-    combat: 1,
-    stealth: 1,
-    magic: 1
-  }
-};
-
-export const STARTING_GAME_STATE: Omit<GameState, 'player'> = {
-  world: 'Ethoria - A realm of seven kingdoms, each founded on distinct moral principles',
-  location: 'Ravenhurst - A town of skilled hunters and trappers in the Kingdom of Valdor',
-  completedQuests: [],
-  gameHistory: [{
-    id: '1',
-    type: 'system',
-    content: 'Welcome to the mystical realm of Ethoria! You find yourself in Ravenhurst, a town known for its skilled hunters. Your adventure begins now.',
-    timestamp: new Date()
-  }],
-  isLoading: false
-};
+// Removed - using real Ethoria data instead

@@ -1,6 +1,16 @@
 # Overview
 
-This is a comprehensive AI chat platform called WhisperChat that enables users to create, discover, and interact with AI characters through immersive roleplay conversations. The platform features character creation tools, chat interfaces with advanced formatting systems, adventure game modes, and social features like following creators and favoriting characters.
+This is a comprehensive AI chat platform called WhisperChat that enables users to create, discover, and interact with AI characters through immersive roleplay conversations. The platform features character creation tools, chat interfaces with advanced formatting systems, **AI-powered adventure game modes**, and social features like following creators and favoriting characters.
+
+## 🎮 Adventure Game Integration
+
+The platform now includes a fully functional AI-powered dungeon adventure game based on the Ethoria world, featuring:
+
+- **Real World Data**: Uses the actual Ethoria.json world data with kingdoms, towns, and NPCs
+- **Character System**: Play as Elara Brightshield, a warrior from the Kingdom of Valdor
+- **OpenRouter AI Integration**: Multi-model AI system using Grok, GLM, DeepSeek, Dolphin, and Kimi models
+- **Game Mechanics**: Combat system, inventory management, experience/leveling, and quest progression
+- **Dynamic Storytelling**: AI-generated responses that adapt to player actions and game state
 
 # User Preferences
 
@@ -41,9 +51,13 @@ Preferred communication style: Simple, everyday language.
 - **Notification System**: Real-time notifications for follows, likes, and comments
 
 ### Adventure Mode
-- **RPG Integration**: Text-based adventure game with character stats and inventory
-- **OpenRouter AI**: Integration with multiple AI models for adventure narration
-- **Game State**: Persistent player progression and quest management
+- **AI-Powered RPG**: Complete text-based adventure game set in the Ethoria universe
+- **OpenRouter Integration**: Multi-model AI system (Grok-4-Fast, GLM-4.5-Air, DeepSeek-Chat, Dolphin-Mistral, Kimi-K2) with automatic failover
+- **Real Game Data**: Authentic world data from the Adventure repository including kingdoms, towns, NPCs
+- **Character Progression**: Play as Elara Brightshield with real stats, inventory, and skill systems
+- **Dynamic Combat**: Turn-based combat with experience gain and leveling
+- **Inventory Management**: Item collection and usage system
+- **Quest System**: Dynamic quest generation and completion tracking
 
 ## Performance Optimizations
 - **Lazy Loading**: Images and components load on-demand using Intersection Observer

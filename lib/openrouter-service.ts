@@ -1,36 +1,10 @@
-// OpenRouter AI service for adventure game integration
-export interface OpenRouterModel {
-  id: string;
-  name: string;
-  description: string;
-}
-
-export const ADVENTURE_MODELS: OpenRouterModel[] = [
-  {
-    id: 'x-ai/grok-4-fast:free',
-    name: 'Grok 4 Fast',
-    description: 'Fast and efficient model by xAI'
-  },
-  {
-    id: 'z-ai/glm-4.5-air:free', 
-    name: 'GLM 4.5 Air',
-    description: 'Lightweight model by Zhipu AI'
-  },
-  {
-    id: 'deepseek/deepseek-chat-v3.1:free',
-    name: 'DeepSeek Chat V3.1',
-    description: 'Advanced conversational model'
-  },
-  {
-    id: 'cognitivecomputations/dolphin-mistral-24b-venice-edition:free',
-    name: 'Dolphin Mistral 24B',
-    description: 'Uncensored model for creative content'
-  },
-  {
-    id: 'moonshotai/kimi-k2:free',
-    name: 'Kimi K2',
-    description: 'Multimodal AI model'
-  }
+// OpenRouter AI service for adventure game integration - matches original repository approach
+const ADVENTURE_MODELS = [
+  'x-ai/grok-4-fast:free',
+  'z-ai/glm-4.5-air:free', 
+  'deepseek/deepseek-chat-v3.1:free',
+  'cognitivecomputations/dolphin-mistral-24b-venice-edition:free',
+  'moonshotai/kimi-k2:free'
 ];
 
 export class OpenRouterService {
@@ -47,9 +21,10 @@ export class OpenRouterService {
 
   async generateResponse(
     prompt: string, 
-    model: string = 'x-ai/grok-4-fast:free',
-    systemPrompt?: string
+    systemPrompt?: string,
+    modelIndex: number = 0
   ): Promise<string> {
+    const model = ADVENTURE_MODELS[modelIndex % ADVENTURE_MODELS.length];
     if (!this.apiKey) {
       throw new Error('OpenRouter API key not set');
     }
@@ -95,35 +70,59 @@ export class OpenRouterService {
   async generateAdventureResponse(
     action: string,
     gameState: any,
-    model: string = 'x-ai/grok-4-fast:free'
+    chatHistory: Array<{role: string, content: string}> = []
   ): Promise<string> {
-    const systemPrompt = `You are an AI Game master for a dungeon adventure game. Your job is to write what happens next in a player's adventure.
-
+    const systemPrompt = `You are an AI Game master. Your job is to write what happens next in a player's adventure game.
 CRITICAL Rules:
 - Write EXACTLY 3 sentences maximum
-- Use simple, clear English
-- Start with "You"
-- Don't use character names, only use "you" 
+- Use daily English language
+- Start with "You "
+- Don't use 'Elara' or 'she/he', only use 'you'
 - Use only second person ("you")
 - Never include dialogue after the response
-- Never continue with additional actions
+- Never continue with additional actions or responses
 - Never add follow-up questions or choices
-- Never include conversation prompts
-- Always finish with one complete response
-- Always end with a period (.)
+- Never include 'User:' or 'Assistant:' in response
+- Never include any note or these kinds of sentences: 'Note from the game master'
+- Never use ellipsis (...)
+- Never include 'What would you like to do?' or similar prompts
+- Always finish with one real response
+- Never use 'Your turn' or or anything like conversation starting prompts
+- Always end the response with a period(.)
 
 Game Context:
-- World: ${gameState.world || 'A mystical fantasy realm'}
-- Location: ${gameState.location || 'An ancient dungeon'}
+- World: ${gameState.world || 'Ethoria is a realm of seven kingdoms, each founded on distinct moral principles'}
+- Kingdom: ${gameState.kingdom || 'Valdor, the Kingdom of Courage'}
+- Town: ${gameState.town || 'Ravenhurst, a town of skilled hunters and trappers'}
+- Character: ${gameState.character_name || 'Elara Brightshield'}
+- Character Description: ${gameState.character_description || 'A sturdy warrior with shining silver armor'}
 - Player Level: ${gameState.level || 1}
 - Current HP: ${gameState.health || 100}
-- Inventory: ${gameState.inventory ? Object.keys(gameState.inventory).join(', ') : 'basic equipment'}`;
+- Inventory: ${gameState.inventory ? Object.keys(gameState.inventory).join(', ') : 'cloth pants, cloth shirt, goggles, leather bound journal, gold'}`;
 
     const prompt = `Player action: "${action}"
 
 Generate the next part of the adventure based on this action.`;
 
-    return this.generateResponse(prompt, model, systemPrompt);
+    // Try models in sequence for redundancy (like the original repository)
+    let modelIndex = 0;
+    let maxRetries = ADVENTURE_MODELS.length;
+    
+    while (maxRetries > 0) {
+      try {
+        return await this.generateResponse(prompt, systemPrompt, modelIndex);
+      } catch (error) {
+        console.log(`Model ${ADVENTURE_MODELS[modelIndex]} failed, trying next...`);
+        modelIndex = (modelIndex + 1) % ADVENTURE_MODELS.length;
+        maxRetries--;
+        
+        if (maxRetries === 0) {
+          throw new Error(`All models failed: ${error}`);
+        }
+      }
+    }
+    
+    throw new Error('All models exhausted');
   }
 
   async checkContentSafety(text: string): Promise<boolean> {

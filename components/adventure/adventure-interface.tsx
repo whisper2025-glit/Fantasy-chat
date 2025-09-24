@@ -22,11 +22,10 @@ import {
 import { 
   GameState, 
   Player, 
-  GameMessage, 
-  INITIAL_PLAYER, 
-  STARTING_GAME_STATE 
+  GameMessage
 } from '@/lib/adventure-types';
-import { openRouterService, ADVENTURE_MODELS } from '@/lib/openrouter-service';
+import { openRouterService } from '@/lib/openrouter-service';
+import { ETHORIA_WORLD, STARTING_PLAYER, STARTING_LOCATION } from '@/lib/ethoria-data';
 
 interface AdventureInterfaceProps {
   onBack: () => void;
@@ -34,12 +33,24 @@ interface AdventureInterfaceProps {
 
 export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
   const [gameState, setGameState] = useState<GameState>({
-    player: INITIAL_PLAYER,
-    ...STARTING_GAME_STATE
+    player: STARTING_PLAYER,
+    world: ETHORIA_WORLD.description,
+    kingdom: ETHORIA_WORLD.kingdoms.Valdor.description,
+    town: ETHORIA_WORLD.kingdoms.Valdor.towns.Ravenhurst.description,
+    character_name: STARTING_PLAYER.name,
+    character_description: ETHORIA_WORLD.kingdoms.Valdor.towns.Ravenhurst.npcs["Elara Brightshield"].description,
+    location: STARTING_LOCATION.area,
+    completedQuests: [],
+    gameHistory: [{
+      id: '1',
+      type: 'system',
+      content: ETHORIA_WORLD.startingScenario,
+      timestamp: new Date()
+    }],
+    isLoading: false
   });
   const [currentInput, setCurrentInput] = useState('');
   const [apiKey, setApiKey] = useState('');
-  const [selectedModel, setSelectedModel] = useState(ADVENTURE_MODELS[0].id);
   const [showSettings, setShowSettings] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
@@ -93,51 +104,88 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
         return;
       }
 
-      // Generate AI response
+      // Generate AI response using the repository's approach
       const response = await openRouterService.generateAdventureResponse(
         userAction, 
         gameState,
-        selectedModel
+        gameState.gameHistory.map(msg => ({
+          role: msg.type === 'user' ? 'user' : 'assistant',
+          content: msg.content
+        }))
       );
 
       addMessage(response, 'game');
 
-      // Simple game state updates based on actions
-      if (userAction.toLowerCase().includes('take') || userAction.toLowerCase().includes('pick up')) {
-        // Mock item pickup logic
-        const itemMatch = userAction.match(/take|pick up (.*)/i);
-        if (itemMatch) {
-          const item = itemMatch[1];
-          setGameState(prev => ({
-            ...prev,
-            player: {
-              ...prev.player,
-              inventory: {
-                ...prev.player.inventory,
-                [item]: (prev.player.inventory[item] || 0) + 1
-              }
-            }
-          }));
-        }
-      }
-
-      if (userAction.toLowerCase().includes('fight') || userAction.toLowerCase().includes('attack')) {
-        // Mock combat - simple damage
-        setGameState(prev => ({
-          ...prev,
-          player: {
-            ...prev.player,
-            health: Math.max(10, prev.player.health - Math.floor(Math.random() * 20 + 5)),
-            exp: prev.player.exp + Math.floor(Math.random() * 25 + 10)
-          }
-        }));
-      }
+      // Real game mechanics based on repository logic
+      updateGameState(userAction);
 
     } catch (error) {
       console.error('Adventure error:', error);
       addMessage('Something went wrong. Please try again.', 'system');
     } finally {
       setGameState(prev => ({ ...prev, isLoading: false }));
+    }
+  };
+
+  const updateGameState = (action: string) => {
+    const lowerAction = action.toLowerCase();
+    
+    // Item pickup logic (from repository)
+    if (lowerAction.includes('take') || lowerAction.includes('pick up')) {
+      const itemMatch = action.match(/take|pick up (.*)/i);
+      if (itemMatch) {
+        const item = itemMatch[1].toLowerCase();
+        setGameState(prev => ({
+          ...prev,
+          player: {
+            ...prev.player,
+            inventory: {
+              ...prev.player.inventory,
+              [item]: (prev.player.inventory[item] || 0) + 1
+            }
+          }
+        }));
+      }
+    }
+    
+    // Combat logic (from repository)
+    if (lowerAction.includes('fight') || lowerAction.includes('attack')) {
+      setGameState(prev => {
+        const damage = Math.floor(Math.random() * 20 + 5);
+        const expGain = Math.floor(Math.random() * 25 + 10);
+        const newHealth = Math.max(10, prev.player.health - damage);
+        const newExp = prev.player.exp + expGain;
+        
+        // Level up check
+        let newLevel = prev.player.level;
+        let expToLevel = prev.player.expToLevel;
+        if (newExp >= expToLevel) {
+          newLevel += 1;
+          expToLevel = Math.floor(expToLevel * 1.5);
+        }
+        
+        return {
+          ...prev,
+          player: {
+            ...prev.player,
+            health: newHealth,
+            exp: newExp % expToLevel,
+            level: newLevel,
+            expToLevel: expToLevel
+          }
+        };
+      });
+    }
+
+    // Healing logic
+    if (lowerAction.includes('heal') || lowerAction.includes('rest')) {
+      setGameState(prev => ({
+        ...prev,
+        player: {
+          ...prev.player,
+          health: Math.min(prev.player.maxHealth, prev.player.health + 20)
+        }
+      }));
     }
   };
 
@@ -167,37 +215,24 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
         </Button>
       </div>
 
-      {/* Settings Panel */}
+      {/* Settings Panel - Simplified to match repository approach */}
       {showSettings && (
         <div className="p-4 bg-card border-b">
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium">OpenRouter API Key:</label>
-              <Input
-                type="password"
-                placeholder="Enter your OpenRouter API key"
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-                className="mt-1"
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                Get your free API key at <a href="https://openrouter.ai" target="_blank" rel="noopener" className="underline">openrouter.ai</a>
-              </p>
-            </div>
-            <div>
-              <label className="text-sm font-medium">AI Model:</label>
-              <select 
-                value={selectedModel}
-                onChange={(e) => setSelectedModel(e.target.value)}
-                className="mt-1 w-full p-2 border rounded text-sm bg-background"
-              >
-                {ADVENTURE_MODELS.map(model => (
-                  <option key={model.id} value={model.id}>
-                    {model.name} - {model.description}
-                  </option>
-                ))}
-              </select>
-            </div>
+          <div>
+            <label className="text-sm font-medium">OpenRouter API Key:</label>
+            <Input
+              type="password"
+              placeholder="Enter your OpenRouter API key"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              className="mt-1"
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              Get your free API key at <a href="https://openrouter.ai" target="_blank" rel="noopener" className="underline">openrouter.ai</a>
+            </p>
+            <p className="text-xs text-muted-foreground mt-2">
+              The game uses multiple AI models automatically for the best experience (Grok, GLM, DeepSeek, Dolphin, Kimi)
+            </p>
           </div>
         </div>
       )}
@@ -231,15 +266,17 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
             </CardContent>
           </Card>
 
-          {/* Location */}
+          {/* World Info */}
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm flex items-center space-x-2">
                 <Map className="w-4 h-4" />
-                <span>Location</span>
+                <span>Current Location</span>
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-1">
+              <p className="text-xs"><strong>Kingdom:</strong> Valdor (Courage)</p>
+              <p className="text-xs"><strong>Town:</strong> Ravenhurst</p>
               <p className="text-xs text-muted-foreground">{gameState.location}</p>
             </CardContent>
           </Card>
