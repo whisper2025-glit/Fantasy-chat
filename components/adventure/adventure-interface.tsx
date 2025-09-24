@@ -4,24 +4,22 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-// Using regular div for scrolling since ScrollArea component is not available
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { 
   Sword, 
-  Shield, 
   Heart, 
   Star, 
   Backpack, 
   Map, 
   Settings,
   Send,
-  Loader2
+  Loader2,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 
 import { 
   GameState, 
-  Player, 
   GameMessage
 } from '@/lib/adventure-types';
 import { openRouterService } from '@/lib/openrouter-service';
@@ -52,17 +50,16 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
   const [currentInput, setCurrentInput] = useState('');
   const [apiKey, setApiKey] = useState('');
   const [showSettings, setShowSettings] = useState(false);
+  const [isInfoSidebarOpen, setIsInfoSidebarOpen] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Scroll to bottom when new messages are added
     if (scrollAreaRef.current) {
       scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
     }
   }, [gameState.gameHistory]);
 
   useEffect(() => {
-    // Set API key if available
     if (apiKey) {
       openRouterService.setApiKey(apiKey);
     }
@@ -97,14 +94,12 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
     setGameState(prev => ({ ...prev, isLoading: true }));
 
     try {
-      // Check content safety
       const isSafe = await openRouterService.checkContentSafety(userAction);
       if (!isSafe) {
         addMessage('This action was blocked for safety reasons. Please try something else.', 'system');
         return;
       }
 
-      // Generate AI response using the repository's approach
       const response = await openRouterService.generateAdventureResponse(
         userAction, 
         gameState,
@@ -116,7 +111,6 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
 
       addMessage(response, 'game');
 
-      // Real game mechanics based on repository logic
       updateGameState(userAction);
 
     } catch (error) {
@@ -130,7 +124,6 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
   const updateGameState = (action: string) => {
     const lowerAction = action.toLowerCase();
     
-    // Item pickup logic (from repository)
     if (lowerAction.includes('take') || lowerAction.includes('pick up')) {
       const itemMatch = action.match(/take|pick up (.*)/i);
       if (itemMatch) {
@@ -148,7 +141,6 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
       }
     }
     
-    // Combat logic (from repository)
     if (lowerAction.includes('fight') || lowerAction.includes('attack')) {
       setGameState(prev => {
         const damage = Math.floor(Math.random() * 20 + 5);
@@ -156,7 +148,6 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
         const newHealth = Math.max(10, prev.player.health - damage);
         const newExp = prev.player.exp + expGain;
         
-        // Level up check
         let newLevel = prev.player.level;
         let expToLevel = prev.player.expToLevel;
         if (newExp >= expToLevel) {
@@ -177,7 +168,6 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
       });
     }
 
-    // Healing logic
     if (lowerAction.includes('heal') || lowerAction.includes('rest')) {
       setGameState(prev => ({
         ...prev,
@@ -198,7 +188,6 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
 
   return (
     <div className="h-screen flex flex-col bg-background text-foreground">
-      {/* Enhanced Header with Gradient */}
       <div className="flex-shrink-0 bg-card/95 backdrop-blur-xl border-b border-border px-6 py-4 z-30 shadow-xl">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-6">
@@ -231,7 +220,6 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
         </div>
       </div>
 
-      {/* Enhanced Settings Panel */}
       {showSettings && (
         <div className="bg-card/95 backdrop-blur-xl border-b border-border p-6 shadow-lg">
           <div className="max-w-2xl">
@@ -253,7 +241,7 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
                 />
                 <div className="mt-2 space-y-1">
                   <p className="text-xs text-muted-foreground">
-                    Get your free API key at{" "}
+                    Get your free API key at{' '}
                     <a 
                       href="https://openrouter.ai" 
                       target="_blank" 
@@ -276,48 +264,10 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
         </div>
       )}
 
-      <div className="flex-1 flex">
-        {/* Enhanced Sidebar with Player Stats */}
-        <div className="w-80 bg-card/95 backdrop-blur-xl border-r border-border shadow-xl p-6 space-y-6">
-          {/* Enhanced Player Info Card */}
-          <Card className="bg-muted/70 border-border shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm flex items-center space-x-3">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md">
-                  <Sword className="w-4 h-4 text-black" />
-                </div>
-                <div>
-                  <span className="text-foreground font-semibold">{gameState.player.name}</span>
-                  <div className="text-xs text-muted-foreground">Warrior of Valdor</div>
-                </div>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">Level {gameState.player.level}</span>
-                <Badge variant="outline" className="bg-gradient-to-r from-cyan-400/10 to-blue-500/10 border-blue-500/30 text-blue-300">
-                  {gameState.player.exp}/{gameState.player.expToLevel} XP
-                </Badge>
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs">
-                  <div className="flex items-center space-x-2">
-                    <Heart className="w-3 h-3 text-red-400" />
-                    <span className="text-muted-foreground">Health</span>
-                  </div>
-                  <span className="text-foreground font-medium">{gameState.player.health}/{gameState.player.maxHealth}</span>
-                </div>
-                <div className="w-full bg-muted rounded-full h-2.5 shadow-inner">
-                  <div 
-                    className="bg-gradient-to-r from-red-500 to-red-400 h-2.5 rounded-full shadow-sm transition-all duration-500" 
-                    style={{ width: `${(gameState.player.health / gameState.player.maxHealth) * 100}%` }}
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Enhanced World Info */}
+      {/* Slide-out Info Sidebar: Current Location, Skills, Inventory */}
+      <div className={`fixed top-0 left-0 h-full w-80 bg-card/95 backdrop-blur-xl border-r border-border transform transition-transform duration-300 z-40 shadow-2xl ${isInfoSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="p-6 space-y-6">
+          {/* Current Location */}
           <Card className="bg-muted/70 border-border shadow-lg hover:shadow-xl transition-shadow duration-300">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm flex items-center space-x-3">
@@ -348,7 +298,7 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
             </CardContent>
           </Card>
 
-          {/* Enhanced Skills */}
+          {/* Skills */}
           <Card className="bg-muted/70 border-border shadow-lg hover:shadow-xl transition-shadow duration-300">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm flex items-center space-x-3">
@@ -368,9 +318,9 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
                         <Star 
                           key={i} 
                           className={`w-3 h-3 ${
-                            i < level 
-                              ? "fill-yellow-400 text-yellow-400" 
-                              : "text-muted-foreground/30"
+                            i < (level as number)
+                              ? 'fill-yellow-400 text-yellow-400' 
+                              : 'text-muted-foreground/30'
                           } transition-colors`} 
                         />
                       ))}
@@ -381,7 +331,7 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
             </CardContent>
           </Card>
 
-          {/* Enhanced Inventory */}
+          {/* Inventory */}
           <Card className="bg-muted/70 border-border shadow-lg hover:shadow-xl transition-shadow duration-300">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm flex items-center space-x-3">
@@ -408,10 +358,22 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
             </CardContent>
           </Card>
         </div>
+      </div>
 
-        {/* Enhanced Main Game Area */}
+      {/* Edge toggle button that hugs the left screen edge or drawer edge */}
+      <div className={`fixed top-1/2 transform -translate-y-1/2 z-50 ${isInfoSidebarOpen ? 'left-80' : 'left-0'}`}>
+        <button
+          aria-label={isInfoSidebarOpen ? 'Close sidebar' : 'Open sidebar'}
+          onClick={() => setIsInfoSidebarOpen(v => !v)}
+          className="bg-card/90 backdrop-blur border border-border rounded-r-xl p-2 hover:bg-muted transition-colors shadow-lg"
+        >
+          {isInfoSidebarOpen ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
+        </button>
+      </div>
+
+      <div className="flex-1 flex">
+        {/* Main Game Area */}
         <div className="flex-1 flex flex-col bg-background">
-          {/* Game History with Enhanced Styling */}
           <div className="flex-1 p-6 overflow-y-auto scroll-container scrollbar-thin" ref={scrollAreaRef}>
             <div className="space-y-4 max-w-4xl">
               {gameState.gameHistory.map((message) => (
@@ -461,7 +423,6 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
             </div>
           </div>
 
-          {/* Enhanced Input Area */}
           <div className="bg-card/95 backdrop-blur-xl border-t border-border p-6 shadow-xl">
             <div className="max-w-4xl space-y-4">
               <div className="flex space-x-3">
