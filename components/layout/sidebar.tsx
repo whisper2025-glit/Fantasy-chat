@@ -5,14 +5,21 @@ import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 
 // Sidebar Component
-const Sidebar = memo(
-  ({
-    isOpen,
-    toggleSidebar,
-    setActiveTab,
-    activeTab,
-    setSelectedCharacter,
-  }) => {
+interface SidebarProps {
+  isOpen: boolean;
+  toggleSidebar: () => void;
+  setActiveTab: (tab: string) => void;
+  activeTab: string;
+  setSelectedCharacter: (character: any) => void;
+}
+
+const Sidebar = memo(({
+  isOpen,
+  toggleSidebar,
+  setActiveTab,
+  activeTab,
+  setSelectedCharacter,
+}: SidebarProps) => {
     const items = ["Discover", "Recent Chats", "Create", "Adventure", "Sign Out"];
 
     return (
