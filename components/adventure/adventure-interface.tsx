@@ -4,13 +4,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Sword, 
-  Heart, 
-  Star, 
-  Backpack, 
-  Map, 
+import {
+  Sword,
+  Heart,
+  Star,
+  Backpack,
+  Map,
   Settings,
   Send,
   Loader2,
@@ -52,6 +53,27 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
   const [showSettings, setShowSettings] = useState(false);
   const [showComposer, setShowComposer] = useState(false);
   const [isInfoSidebarOpen, setIsInfoSidebarOpen] = useState(false);
+
+  // Turn composer behavior
+  type TurnMode = 'actions' | 'story';
+  const [turnMode, setTurnMode] = useState<TurnMode>('actions');
+  const [isModeSliderOpen, setIsModeSliderOpen] = useState(false);
+
+  const MODES: TurnMode[] = ['actions', 'story'];
+  const MODE_LABEL: Record<TurnMode, string> = {
+    actions: 'Actions',
+    story: 'Story',
+  };
+  const MODE_PLACEHOLDER: Record<TurnMode, string> = {
+    actions: 'What do you do or say?',
+    story: 'Continue the story…',
+  };
+  const stepMode = (delta: number) => {
+    const idx = MODES.indexOf(turnMode);
+    const next = (idx + delta + MODES.length) % MODES.length;
+    setTurnMode(MODES[next]);
+  };
+
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -88,10 +110,14 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
       return;
     }
 
-    const userAction = currentInput.trim();
+    const prefixMap: Record<TurnMode, string> = {
+      actions: 'Actions',
+      story: 'Story',
+    };
+    const userAction = `${prefixMap[turnMode]}: ${currentInput.trim()}`;
     addMessage(userAction, 'user');
     setCurrentInput('');
-    
+
     setGameState(prev => ({ ...prev, isLoading: true }));
 
     try {
@@ -495,37 +521,84 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
           </div>
 
           <div className="bg-card/95 backdrop-blur-xl border-t border-border p-3 shadow-xl">
-            <div className="max-w-4xl">
+            <div className="max-w-6xl w-full">
               {showComposer ? (
-                <div className="flex items-center gap-3">
-                  <div className="flex-1 relative">
-                    <Input
-                      placeholder="What would you like to do? (e.g., look around, examine door, take sword)"
+                <div className="flex items-end gap-3">
+                  <div className="flex-1 relative w-full">
+                    {/* Mode pill and slider */}
+                    <div className="absolute -top-12 left-0">
+                      <div className="flex items-center gap-2 bg-card/90 border border-border rounded-xl px-2 py-1 shadow-md">
+                          {isModeSliderOpen ? (
+                          <div className="flex items-center gap-2">
+                            {MODES.map((m) => (
+                              <button
+                                key={m}
+                                onClick={() => { setTurnMode(m); setIsModeSliderOpen(false); }}
+                                className={`px-3 py-1 rounded-md text-sm border ${
+                                  m === turnMode
+                                    ? 'bg-muted/80 border-white/20 text-white'
+                                    : 'bg-transparent border-transparent text-muted-foreground hover:bg-muted/40'
+                                }`}
+                              >
+                                {MODE_LABEL[m]}
+                              </button>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-1">
+                            <button
+                              aria-label="Previous mode"
+                              onClick={() => stepMode(-1)}
+                              className="p-1 rounded-md hover:bg-muted/60"
+                            >
+                              <ChevronLeft className="w-4 h-4" />
+                            </button>
+                            <button
+                              aria-label="Toggle mode slider"
+                              onClick={() => setIsModeSliderOpen(true)}
+                              className="px-3 py-1 rounded-md text-sm bg-muted/60 hover:bg-muted border border-white/10"
+                            >
+                              {MODE_LABEL[turnMode]}
+                            </button>
+                            <button
+                              aria-label="Next mode"
+                              onClick={() => stepMode(1)}
+                              className="p-1 rounded-md hover:bg-muted/60"
+                            >
+                              <ChevronRight className="w-4 h-4" />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <Textarea
+                      placeholder={MODE_PLACEHOLDER[turnMode]}
                       value={currentInput}
                       onChange={(e) => setCurrentInput(e.target.value)}
-                      onKeyPress={handleKeyPress}
+                      onKeyDown={handleKeyPress}
                       disabled={gameState.isLoading}
-                      className="bg-muted/70 border-border text-foreground placeholder:text-muted-foreground pr-10 py-2 text-sm focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 transition-all"
+                      className="bg-muted/70 border-border text-foreground placeholder:text-muted-foreground pr-20 py-3 text-sm focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 transition-all min-h-[64px] w-full"
                     />
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <div className="absolute right-3 bottom-2 flex items-center gap-2">
                       <Badge variant="secondary" className="text-[10px] bg-gradient-to-r from-cyan-400/10 to-blue-500/10 text-cyan-300">
                         Enter ↵
                       </Badge>
+                      <button
+                        onClick={handleAction}
+                        disabled={!currentInput.trim() || gameState.isLoading}
+                        aria-label="Send"
+                        className="flex items-center justify-center w-9 h-9 rounded-md bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg transition-all duration-200"
+                      >
+                        <Send className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
-                  <Button
-                    onClick={handleAction}
-                    disabled={!currentInput.trim() || gameState.isLoading}
-                    size="sm"
-                    className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-4"
-                  >
-                    <Send className="w-4 h-4" />
-                  </Button>
                 </div>
               ) : (
                 <div className="flex items-center gap-3">
                   <Button
-                    onClick={() => setShowComposer(true)}
+                    onClick={() => { setTurnMode('actions'); setIsModeSliderOpen(false); setShowComposer(true); }}
                     className="flex-1 h-10 bg-muted/60 hover:bg-muted text-foreground border border-white/10"
                     variant="secondary"
                   >
