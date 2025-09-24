@@ -54,7 +54,7 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
   const [currentInput, setCurrentInput] = useState('');
   const [apiKey, setApiKey] = useState('');
   const [showSettings, setShowSettings] = useState(false);
-  const [showComposer, setShowComposer] = useState(false);
+  const [showComposer, setShowComposer] = useState(true);
   const [isInfoSidebarOpen, setIsInfoSidebarOpen] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [actionMode, setActionMode] = useState<'Do' | 'Say' | 'Story' | 'See'>('Say');
