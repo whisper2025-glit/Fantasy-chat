@@ -5,17 +5,21 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Sword, 
-  Heart, 
-  Star, 
-  Backpack, 
-  Map, 
+import {
+  Sword,
+  Heart,
+  Star,
+  Backpack,
+  Map,
   Settings,
   Send,
   Loader2,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  MessageSquare,
+  Eye,
+  ScrollText,
+  Hand
 } from 'lucide-react';
 
 import { 
@@ -50,9 +54,40 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
   const [currentInput, setCurrentInput] = useState('');
   const [apiKey, setApiKey] = useState('');
   const [showSettings, setShowSettings] = useState(false);
-  const [showComposer, setShowComposer] = useState(false);
+  const [showComposer, setShowComposer] = useState(true);
   const [isInfoSidebarOpen, setIsInfoSidebarOpen] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const [actionMode, setActionMode] = useState<'Do' | 'Say' | 'Story' | 'See'>('Say');
+  const sliderRef = useRef<HTMLDivElement>(null);
+  const ACTIONS: { key: 'Do' | 'Say' | 'Story' | 'See'; label: string; Icon: React.ComponentType<{ className?: string }> }[] = [
+    { key: 'Do', label: 'Do', Icon: Hand },
+    { key: 'Say', label: 'Say', Icon: MessageSquare },
+    { key: 'Story', label: 'Story', Icon: ScrollText },
+    { key: 'See', label: 'See', Icon: Eye },
+  ];
+
+  const getPlaceholder = () => {
+    switch (actionMode) {
+      case 'Say':
+        return 'What do you say?';
+      case 'Story':
+        return 'Add story details...';
+      case 'See':
+        return 'What do you look at?';
+      default:
+        return 'What do you do?';
+    }
+  };
+
+  const cycleAction = (dir: -1 | 1) => {
+    const idx = ACTIONS.findIndex(a => a.key === actionMode);
+    const next = ACTIONS[(idx + dir + ACTIONS.length) % ACTIONS.length].key;
+    setActionMode(next);
+    if (sliderRef.current) {
+      const amount = dir * 120;
+      sliderRef.current.scrollBy({ left: amount, behavior: 'smooth' });
+    }
+  };
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -81,17 +116,36 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
   };
 
   const handleAction = async () => {
-    if (!currentInput.trim()) return;
+    const raw = currentInput.trim();
+    if (!raw) return;
     if (!apiKey) {
       alert('Please set your OpenRouter API key in settings first!');
       setShowSettings(true);
       return;
     }
 
-    const userAction = currentInput.trim();
+    let userAction: string;
+    if (raw === 'continue' || raw === 'retry') {
+      userAction = raw;
+    } else {
+      switch (actionMode) {
+        case 'Say':
+          userAction = raw.startsWith('"') || raw.startsWith("'") ? `say ${raw}` : `say "${raw}"`;
+          break;
+        case 'Story':
+          userAction = `narrate: ${raw}`;
+          break;
+        case 'See':
+          userAction = raw ? `look: ${raw}` : 'look around';
+          break;
+        default:
+          userAction = raw;
+      }
+    }
+
     addMessage(userAction, 'user');
     setCurrentInput('');
-    
+
     setGameState(prev => ({ ...prev, isLoading: true }));
 
     try {
@@ -102,7 +156,7 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
       }
 
       const response = await openRouterService.generateAdventureResponse(
-        userAction, 
+        userAction,
         gameState,
         gameState.gameHistory.map(msg => ({
           role: msg.type === 'user' ? 'user' : 'assistant',
@@ -497,30 +551,56 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
           <div className="bg-card/95 backdrop-blur-xl border-t border-border p-3 shadow-xl">
             <div className="max-w-4xl">
               {showComposer ? (
-                <div className="flex items-center gap-3">
-                  <div className="flex-1 relative">
-                    <Input
-                      placeholder="What would you like to do? (e.g., look around, examine door, take sword)"
-                      value={currentInput}
-                      onChange={(e) => setCurrentInput(e.target.value)}
-                      onKeyPress={handleKeyPress}
-                      disabled={gameState.isLoading}
-                      className="bg-muted/70 border-border text-foreground placeholder:text-muted-foreground pr-10 py-2 text-sm focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 transition-all"
-                    />
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                      <Badge variant="secondary" className="text-[10px] bg-gradient-to-r from-cyan-400/10 to-blue-500/10 text-cyan-300">
-                        Enter ↵
-                      </Badge>
+                <div className="space-y-3">
+                  <div className="flex items-center">
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" onClick={() => cycleAction(-1)}>
+                      <ChevronLeft className="w-4 h-4" />
+                    </Button>
+                    <div
+                      ref={sliderRef}
+                      className="flex-1 mx-2 flex gap-2 overflow-x-auto scrollbar-thin snap-x snap-mandatory px-2 py-1 rounded-xl bg-muted/60 border border-white/10"
+                    >
+                      {ACTIONS.map(({ key, label, Icon }) => (
+                        <button
+                          key={key}
+                          onClick={() => setActionMode(key)}
+                          className={`inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg snap-center min-w-[90px] transition-colors ${actionMode === key ? 'bg-card text-foreground shadow' : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'}`}
+                        >
+                          <Icon className="w-4 h-4" />
+                          <span className="text-sm font-medium">{label}</span>
+                        </button>
+                      ))}
                     </div>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" onClick={() => cycleAction(1)}>
+                      <ChevronRight className="w-4 h-4" />
+                    </Button>
                   </div>
-                  <Button
-                    onClick={handleAction}
-                    disabled={!currentInput.trim() || gameState.isLoading}
-                    size="sm"
-                    className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-4"
-                  >
-                    <Send className="w-4 h-4" />
-                  </Button>
+
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1 relative">
+                      <Input
+                        placeholder={getPlaceholder()}
+                        value={currentInput}
+                        onChange={(e) => setCurrentInput(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        disabled={gameState.isLoading}
+                        className="bg-muted/70 border-border text-foreground placeholder:text-muted-foreground pr-10 py-2 text-sm focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 transition-all"
+                      />
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                        <Badge variant="secondary" className="text-[10px] bg-gradient-to-r from-cyan-400/10 to-blue-500/10 text-cyan-300">
+                          Enter ↵
+                        </Badge>
+                      </div>
+                    </div>
+                    <Button
+                      onClick={handleAction}
+                      disabled={!currentInput.trim() || gameState.isLoading}
+                      size="sm"
+                      className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-4"
+                    >
+                      <Send className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
               ) : (
                 <div className="flex items-center gap-3">
