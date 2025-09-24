@@ -13,7 +13,7 @@ const Sidebar = memo(
     activeTab,
     setSelectedCharacter,
   }) => {
-    const items = ["Discover", "Recent Chats", "Create", "Sign Out"];
+    const items = ["Discover", "Recent Chats", "Create", "Adventure", "Sign Out"];
 
     return (
       <div

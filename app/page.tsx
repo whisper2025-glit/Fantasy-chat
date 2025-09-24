@@ -15,6 +15,7 @@ import RecentChats from "@/components/recent-chats"
 import ExplorePage from "@/components/explore-page"
 import PersonalPage from "@/components/personal-page"
 import CreatorInfoPage from "@/components/creator-info-page"
+import { AdventureInterface } from "@/components/adventure/adventure-interface"
 import FormattedText from "@/components/chat/formatted-text"
 import { getPublicCharacters } from "@/lib/storage"
 
@@ -49,7 +50,7 @@ const Sidebar = ({
   onClose: () => void
   onNavigate: (tab: string) => void
 }) => {
-  const sidebarItems = ["Discover", "Explore", "Recent Chats", "Personal", "Profile", "Create", "Sign Out"]
+  const sidebarItems = ["Discover", "Explore", "Recent Chats", "Personal", "Profile", "Create", "Adventure", "Sign Out"]
 
   return (
     <>
@@ -135,6 +136,7 @@ export default function OriginalHomePage() {
   const [showExplorePage, setShowExplorePage] = useState(false)
   const [showPersonalPage, setShowPersonalPage] = useState(false)
   const [showCreatorInfo, setShowCreatorInfo] = useState(false)
+  const [showAdventure, setShowAdventure] = useState(false)
   const [selectedCreatorId, setSelectedCreatorId] = useState<string | null>(null)
   const [characters, setCharacters] = useState<Character[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -315,6 +317,7 @@ export default function OriginalHomePage() {
     setShowExplorePage(false)
     setShowPersonalPage(false)
     setShowCreatorInfo(false)
+    setShowAdventure(false)
 
     switch (item) {
       case "Discover":
@@ -335,7 +338,9 @@ export default function OriginalHomePage() {
       case "Profile":
         router.push("/profile")
         break
-
+      case "Adventure":
+        setShowAdventure(true)
+        break
       default:
         console.log(`Navigate to: ${item}`)
     }
@@ -394,6 +399,7 @@ export default function OriginalHomePage() {
     setShowExplorePage(false)
     setShowPersonalPage(false)
     setShowCreatorInfo(false)
+    setShowAdventure(false)
     setSelectedCreatorId(null)
 
     setShowSortDropdown(false)
@@ -449,6 +455,15 @@ export default function OriginalHomePage() {
           setShowCreatorInfo(true)
           setShowPersonalPage(false)
         }}
+      />
+    )
+  }
+
+  // Show adventure game
+  if (showAdventure) {
+    return (
+      <AdventureInterface
+        onBack={() => setShowAdventure(false)}
       />
     )
   }
