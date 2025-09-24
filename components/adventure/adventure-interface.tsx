@@ -359,10 +359,18 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
           {/* Status Panel (Player, Nature, Stats, Skill) */}
           <Card className="bg-muted/70 border-border shadow-lg hover:shadow-xl transition-shadow duration-300">
             <CardContent className="space-y-3 text-[9px] text-white/90">
+              {/* User status block */}
+              <div className="mb-2">
+                <span className="text-xs text-muted-foreground uppercase tracking-wide">User status</span>
+                <div className="mt-1 inline-block px-2 py-1 text-sm rounded-md bg-muted/40 border border-border text-white/90">
+                  {gameState.player.name}
+                </div>
+              </div>
+
               {/* Player */}
               <div className="flex items-center gap-3">
                 <span className="font-semibold">Player</span>
-                <span className="text-white/90">Cha Yeon-woo</span>
+                <span className="text-white/90">{gameState.player.name}</span>
               </div>
 
               {/* Nature */}
