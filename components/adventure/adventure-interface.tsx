@@ -590,7 +590,7 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
                       placeholder={MODE_PLACEHOLDER[turnMode]}
                       value={currentInput}
                       onChange={(e) => setCurrentInput(e.target.value)}
-                      onKeyDown={handleKeyPress as any}
+                      onKeyDown={handleKeyPress}
                       disabled={gameState.isLoading}
                       className="bg-muted/70 border-border text-foreground placeholder:text-muted-foreground pr-14 py-2 text-sm focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 transition-all min-h-[56px]"
                     />
