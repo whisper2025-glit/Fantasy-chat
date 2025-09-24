@@ -112,10 +112,8 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
     }
 
     const prefixMap: Record<TurnMode, string> = {
-      say: 'Say',
-      do: 'Do',
+      actions: 'Actions',
       story: 'Story',
-      see: 'See',
     };
     const userAction = `${prefixMap[turnMode]}: ${currentInput.trim()}`;
     addMessage(userAction, 'user');
