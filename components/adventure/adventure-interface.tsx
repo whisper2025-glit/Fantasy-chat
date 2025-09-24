@@ -4,18 +4,20 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Sword, 
-  Heart, 
-  Star, 
-  Backpack, 
-  Map, 
+import {
+  Sword,
+  Heart,
+  Star,
+  Backpack,
+  Map,
   Settings,
   Send,
   Loader2,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  X
 } from 'lucide-react';
 
 import { 
