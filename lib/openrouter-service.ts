@@ -1,6 +1,8 @@
 // OpenRouter AI service for adventure game integration
 const ADVENTURE_MODELS = [
-  'cognitivecomputations/dolphin-mistral-24b-venice-edition:free'
+  'x-ai/grok-4-fast:free',
+  'nvidia/nemotron-nano-9b-v2:free', 
+  'openai/gpt-oss-120b:free'
 ];
 
 export class OpenRouterService {

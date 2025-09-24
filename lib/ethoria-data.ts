@@ -42,7 +42,7 @@ export const STARTING_PLAYER = {
   level: 1,
   exp: 0,
   expToLevel: 100,
-  position: [0, 0],
+  position: [0, 0] as [number, number],
   inventory: {
     "cloth pants": 1,
     "cloth shirt": 1,
