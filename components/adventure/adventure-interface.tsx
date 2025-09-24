@@ -6,9 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import {
-  Sword,
-  Heart,
-  Star,
   Backpack,
   Map,
   Send,
