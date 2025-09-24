@@ -197,123 +197,211 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-background">
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 bg-card border-b">
-        <div className="flex items-center space-x-4">
-          <Button onClick={onBack} variant="outline" size="sm">
-            ← Back
+    <div className="h-screen flex flex-col bg-background text-foreground">
+      {/* Enhanced Header with Gradient */}
+      <div className="flex-shrink-0 bg-card/95 backdrop-blur-xl border-b border-border px-6 py-4 z-30 shadow-xl">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-6">
+            <Button 
+              onClick={onBack} 
+              variant="ghost"
+              className="text-muted-foreground hover:text-foreground transition-colors p-2 hover:bg-muted/50 rounded-lg"
+            >
+              ← Back
+            </Button>
+            <div className="flex items-center space-x-3">
+              <div className="relative w-10 h-10 flex items-center justify-center">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg"></div>
+                <div className="relative z-10 flex items-center justify-center w-full h-full">
+                  <Sword className="w-6 h-6 text-black" />
+                </div>
+                <div className="absolute -top-1 -right-1 w-2 h-2 bg-blue-300 rounded-full opacity-70"></div>
+                <div className="absolute -bottom-1 -left-1 w-1.5 h-1.5 bg-blue-400 rounded-full opacity-60"></div>
+              </div>
+              <h1 className="text-white font-semibold text-lg">Ethoria Adventure</h1>
+            </div>
+          </div>
+          <Button 
+            onClick={() => setShowSettings(!showSettings)} 
+            variant="ghost"
+            className="text-muted-foreground hover:text-foreground transition-colors p-2 hover:bg-muted/50 rounded-lg"
+          >
+            <Settings className="w-5 h-5" />
           </Button>
-          <h1 className="text-xl font-bold">🎮 Adventure Game</h1>
         </div>
-        <Button 
-          onClick={() => setShowSettings(!showSettings)} 
-          variant="outline" 
-          size="sm"
-        >
-          <Settings className="w-4 h-4" />
-        </Button>
       </div>
 
-      {/* Settings Panel - Simplified to match repository approach */}
+      {/* Enhanced Settings Panel */}
       {showSettings && (
-        <div className="p-4 bg-card border-b">
-          <div>
-            <label className="text-sm font-medium">OpenRouter API Key:</label>
-            <Input
-              type="password"
-              placeholder="Enter your OpenRouter API key"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              className="mt-1"
-            />
-            <p className="text-xs text-muted-foreground mt-1">
-              Get your free API key at <a href="https://openrouter.ai" target="_blank" rel="noopener" className="underline">openrouter.ai</a>
-            </p>
-            <p className="text-xs text-muted-foreground mt-2">
-              The game uses multiple AI models automatically for the best experience (Grok, GLM, DeepSeek, Dolphin, Kimi)
-            </p>
+        <div className="bg-card/95 backdrop-blur-xl border-b border-border p-6 shadow-lg">
+          <div className="max-w-2xl">
+            <div className="flex items-center space-x-3 mb-4">
+              <div className="w-8 h-8 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-lg flex items-center justify-center">
+                <Settings className="w-4 h-4 text-black" />
+              </div>
+              <h3 className="text-lg font-semibold text-white">Game Configuration</h3>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium text-foreground mb-2 block">OpenRouter API Key</label>
+                <Input
+                  type="password"
+                  placeholder="Enter your OpenRouter API key"
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                  className="bg-muted/70 border-border text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                />
+                <div className="mt-2 space-y-1">
+                  <p className="text-xs text-muted-foreground">
+                    Get your free API key at{" "}
+                    <a 
+                      href="https://openrouter.ai" 
+                      target="_blank" 
+                      rel="noopener" 
+                      className="text-blue-400 hover:text-blue-300 underline transition-colors"
+                    >
+                      openrouter.ai
+                    </a>
+                  </p>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <p className="text-xs text-muted-foreground">
+                      Multi-model AI system active: Grok • GLM • DeepSeek • Dolphin • Kimi
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}
 
       <div className="flex-1 flex">
-        {/* Sidebar with Player Stats */}
-        <div className="w-80 p-4 bg-card border-r space-y-4">
-          {/* Player Info */}
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center space-x-2">
-                <Sword className="w-4 h-4" />
-                <span>{gameState.player.name}</span>
+        {/* Enhanced Sidebar with Player Stats */}
+        <div className="w-80 bg-card/95 backdrop-blur-xl border-r border-border shadow-xl p-6 space-y-6">
+          {/* Enhanced Player Info Card */}
+          <Card className="bg-muted/70 border-border shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm flex items-center space-x-3">
+                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md">
+                  <Sword className="w-4 h-4 text-black" />
+                </div>
+                <div>
+                  <span className="text-foreground font-semibold">{gameState.player.name}</span>
+                  <div className="text-xs text-muted-foreground">Warrior of Valdor</div>
+                </div>
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2">
-              <div className="flex items-center justify-between text-xs">
-                <span>Level {gameState.player.level}</span>
-                <Badge variant="outline">{gameState.player.exp}/{gameState.player.expToLevel} XP</Badge>
+            <CardContent className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">Level {gameState.player.level}</span>
+                <Badge variant="outline" className="bg-gradient-to-r from-cyan-400/10 to-blue-500/10 border-blue-500/30 text-blue-300">
+                  {gameState.player.exp}/{gameState.player.expToLevel} XP
+                </Badge>
               </div>
-              <div className="flex items-center space-x-2 text-xs">
-                <Heart className="w-3 h-3 text-red-500" />
-                <div className="flex-1 bg-muted rounded-full h-2">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <div className="flex items-center space-x-2">
+                    <Heart className="w-3 h-3 text-red-400" />
+                    <span className="text-muted-foreground">Health</span>
+                  </div>
+                  <span className="text-foreground font-medium">{gameState.player.health}/{gameState.player.maxHealth}</span>
+                </div>
+                <div className="w-full bg-muted rounded-full h-2.5 shadow-inner">
                   <div 
-                    className="bg-red-500 h-2 rounded-full" 
+                    className="bg-gradient-to-r from-red-500 to-red-400 h-2.5 rounded-full shadow-sm transition-all duration-500" 
                     style={{ width: `${(gameState.player.health / gameState.player.maxHealth) * 100}%` }}
                   />
                 </div>
-                <span>{gameState.player.health}/{gameState.player.maxHealth}</span>
               </div>
             </CardContent>
           </Card>
 
-          {/* World Info */}
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center space-x-2">
-                <Map className="w-4 h-4" />
-                <span>Current Location</span>
+          {/* Enhanced World Info */}
+          <Card className="bg-muted/70 border-border shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm flex items-center space-x-3">
+                <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-md">
+                  <Map className="w-4 h-4 text-black" />
+                </div>
+                <span className="text-foreground font-semibold">Current Location</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-1">
-              <p className="text-xs"><strong>Kingdom:</strong> Valdor (Courage)</p>
-              <p className="text-xs"><strong>Town:</strong> Ravenhurst</p>
-              <p className="text-xs text-muted-foreground">{gameState.location}</p>
+            <CardContent className="space-y-3">
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-xs text-muted-foreground">Kingdom:</span>
+                  <Badge variant="secondary" className="bg-blue-500/10 text-blue-300 border-blue-500/30">
+                    Valdor (Courage)
+                  </Badge>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-xs text-muted-foreground">Town:</span>
+                  <Badge variant="secondary" className="bg-green-500/10 text-green-300 border-green-500/30">
+                    Ravenhurst
+                  </Badge>
+                </div>
+              </div>
+              <div className="pt-2 border-t border-border">
+                <p className="text-xs text-muted-foreground italic">{gameState.location}</p>
+              </div>
             </CardContent>
           </Card>
 
-          {/* Skills */}
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm">Skills</CardTitle>
+          {/* Enhanced Skills */}
+          <Card className="bg-muted/70 border-border shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm flex items-center space-x-3">
+                <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-violet-600 rounded-lg flex items-center justify-center shadow-md">
+                  <Star className="w-4 h-4 text-black" />
+                </div>
+                <span className="text-foreground font-semibold">Skills</span>
+              </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-1">
+            <CardContent className="space-y-3">
               {Object.entries(gameState.player.skills).map(([skill, level]) => (
-                <div key={skill} className="flex justify-between text-xs">
-                  <span className="capitalize">{skill}:</span>
-                  <div className="flex items-center space-x-1">
-                    {Array.from({ length: level }, (_, i) => (
-                      <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                    ))}
+                <div key={skill} className="space-y-1">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-muted-foreground capitalize">{skill}</span>
+                    <div className="flex items-center space-x-1">
+                      {Array.from({ length: 5 }, (_, i) => (
+                        <Star 
+                          key={i} 
+                          className={`w-3 h-3 ${
+                            i < level 
+                              ? "fill-yellow-400 text-yellow-400" 
+                              : "text-muted-foreground/30"
+                          } transition-colors`} 
+                        />
+                      ))}
+                    </div>
                   </div>
                 </div>
               ))}
             </CardContent>
           </Card>
 
-          {/* Inventory */}
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center space-x-2">
-                <Backpack className="w-4 h-4" />
-                <span>Inventory</span>
+          {/* Enhanced Inventory */}
+          <Card className="bg-muted/70 border-border shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm flex items-center space-x-3">
+                <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center shadow-md">
+                  <Backpack className="w-4 h-4 text-black" />
+                </div>
+                <span className="text-foreground font-semibold">Inventory</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-1">
+              <div className="space-y-2 max-h-48 overflow-y-auto scrollbar-thin">
                 {Object.entries(gameState.player.inventory).map(([item, count]) => (
-                  <div key={item} className="flex justify-between text-xs">
-                    <span className="capitalize">{item}</span>
-                    <Badge variant="secondary" className="text-xs">{count}</Badge>
+                  <div key={item} className="flex justify-between items-center p-2 rounded-lg bg-muted/40 hover:bg-muted/60 transition-colors">
+                    <span className="text-xs text-foreground capitalize">{item.replace(/([A-Z])/g, ' $1')}</span>
+                    <Badge 
+                      variant="secondary" 
+                      className="bg-gradient-to-r from-cyan-400/20 to-blue-500/20 text-cyan-300 border-cyan-500/30 text-xs"
+                    >
+                      {count}
+                    </Badge>
                   </div>
                 ))}
               </div>
@@ -321,66 +409,98 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
           </Card>
         </div>
 
-        {/* Main Game Area */}
-        <div className="flex-1 flex flex-col">
-          {/* Game History */}
-          <div className="flex-1 p-4 overflow-y-auto" ref={scrollAreaRef}>
+        {/* Enhanced Main Game Area */}
+        <div className="flex-1 flex flex-col bg-background">
+          {/* Game History with Enhanced Styling */}
+          <div className="flex-1 p-6 overflow-y-auto scroll-container scrollbar-thin" ref={scrollAreaRef}>
             <div className="space-y-4 max-w-4xl">
               {gameState.gameHistory.map((message) => (
-                <div key={message.id} className="space-y-2">
-                  <div className={`p-3 rounded-lg ${
+                <div key={message.id} className="animate-fadeIn">
+                  <div className={`p-4 rounded-xl backdrop-blur-sm border transition-all duration-300 hover:shadow-lg ${
                     message.type === 'user' 
-                      ? 'bg-blue-100 dark:bg-blue-900/20 ml-8' 
+                      ? 'bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border-blue-500/20 ml-12 shadow-blue-500/10' 
                       : message.type === 'game'
-                      ? 'bg-muted mr-8'
-                      : 'bg-yellow-100 dark:bg-yellow-900/20 text-center'
+                      ? 'bg-muted/50 border-border mr-12 shadow-lg'
+                      : 'bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-amber-500/20 text-center shadow-amber-500/10'
                   }`}>
-                    <div className="flex items-center justify-between mb-1">
-                      <Badge variant="outline" className="text-xs">
-                        {message.type === 'user' ? 'You' : message.type === 'game' ? 'Game Master' : 'System'}
+                    <div className="flex items-center justify-between mb-3">
+                      <Badge 
+                        variant="outline" 
+                        className={`text-xs font-medium ${
+                          message.type === 'user' 
+                            ? 'bg-blue-500/10 text-blue-300 border-blue-500/30' 
+                            : message.type === 'game'
+                            ? 'bg-green-500/10 text-green-300 border-green-500/30'
+                            : 'bg-amber-500/10 text-amber-300 border-amber-500/30'
+                        }`}
+                      >
+                        {message.type === 'user' ? '⚡ You' : message.type === 'game' ? '🎲 Game Master' : '⚙️ System'}
                       </Badge>
-                      <span className="text-xs text-muted-foreground">
-                        {message.timestamp.toLocaleTimeString()}
+                      <span className="text-xs text-muted-foreground bg-muted/30 px-2 py-1 rounded-full">
+                        {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
-                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground">
+                      {message.content}
+                    </p>
                   </div>
                 </div>
               ))}
               {gameState.isLoading && (
-                <div className="flex items-center justify-center p-4">
-                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                  <span className="text-sm">The Game Master is thinking...</span>
+                <div className="animate-fadeIn">
+                  <div className="flex items-center justify-center p-6 bg-muted/30 rounded-xl backdrop-blur-sm border border-border">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-violet-600 rounded-lg flex items-center justify-center">
+                        <Loader2 className="w-4 h-4 text-black animate-spin" />
+                      </div>
+                      <span className="text-sm text-muted-foreground">The Game Master is weaving your story...</span>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
           </div>
 
-          <Separator />
-
-          {/* Input Area */}
-          <div className="p-4 bg-card">
-            <div className="flex space-x-2">
-              <Input
-                placeholder="What would you like to do? (e.g., look around, examine door, take sword)"
-                value={currentInput}
-                onChange={(e) => setCurrentInput(e.target.value)}
-                onKeyPress={handleKeyPress}
-                disabled={gameState.isLoading}
-                className="flex-1"
-              />
-              <Button 
-                onClick={handleAction} 
-                disabled={!currentInput.trim() || gameState.isLoading}
-                size="sm"
-              >
-                <Send className="w-4 h-4" />
-              </Button>
-            </div>
-            <div className="mt-2">
-              <p className="text-xs text-muted-foreground">
-                Quick actions: look around • examine • take item • go north • attack • inventory • help
-              </p>
+          {/* Enhanced Input Area */}
+          <div className="bg-card/95 backdrop-blur-xl border-t border-border p-6 shadow-xl">
+            <div className="max-w-4xl space-y-4">
+              <div className="flex space-x-3">
+                <div className="flex-1 relative">
+                  <Input
+                    placeholder="What would you like to do? (e.g., look around, examine door, take sword)"
+                    value={currentInput}
+                    onChange={(e) => setCurrentInput(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    disabled={gameState.isLoading}
+                    className="bg-muted/70 border-border text-foreground placeholder:text-muted-foreground pr-12 py-3 text-sm focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                  />
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <Badge variant="secondary" className="text-xs bg-gradient-to-r from-cyan-400/10 to-blue-500/10 text-cyan-300">
+                      Enter ↵
+                    </Badge>
+                  </div>
+                </div>
+                <Button 
+                  onClick={handleAction} 
+                  disabled={!currentInput.trim() || gameState.isLoading}
+                  className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-6"
+                >
+                  <Send className="w-4 h-4" />
+                </Button>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {['look around', 'examine', 'take item', 'go north', 'attack', 'inventory', 'help'].map((action) => (
+                  <Button
+                    key={action}
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setCurrentInput(action)}
+                    className="text-xs text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
+                  >
+                    {action}
+                  </Button>
+                ))}
+              </div>
             </div>
           </div>
         </div>
