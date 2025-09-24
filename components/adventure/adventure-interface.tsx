@@ -581,9 +581,6 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
                       className="bg-muted/70 border-border text-foreground placeholder:text-muted-foreground pr-20 py-3 text-sm focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 transition-all min-h-[160px] w-full"
                     />
                     <div className="absolute right-3 bottom-2 flex items-center gap-2">
-                      <Badge variant="secondary" className="text-[10px] bg-gradient-to-r from-cyan-400/10 to-blue-500/10 text-cyan-300">
-                        Enter ↵
-                      </Badge>
                       <button
                         onClick={handleAction}
                         disabled={!currentInput.trim() || gameState.isLoading}
