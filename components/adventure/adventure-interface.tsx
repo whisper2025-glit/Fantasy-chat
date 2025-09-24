@@ -265,7 +265,7 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
       )}
 
       {/* Slide-out Info Sidebar: Current Location, Skills, Inventory */}
-      <div className={`fixed top-0 left-0 h-full overflow-y-auto w-80 bg-card/95 backdrop-blur-xl border-r border-border transform transition-transform duration-300 z-40 shadow-2xl ${isInfoSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <div className={`fixed top-0 left-0 h-full overflow-y-auto w-72 bg-card/95 backdrop-blur-xl border-r border-border transform transition-transform duration-300 z-40 shadow-2xl ${isInfoSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="p-6 space-y-6">
           {/* Current Location */}
           <Card className="bg-muted/70 border-border shadow-lg hover:shadow-xl transition-shadow duration-300">
@@ -361,7 +361,7 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
       </div>
 
       {/* Edge toggle button that hugs the left screen edge or drawer edge */}
-      <div className={`fixed top-1/2 transform -translate-y-1/2 z-50 ${isInfoSidebarOpen ? 'left-80' : 'left-0'}`}>
+      <div className={`fixed top-1/2 transform -translate-y-1/2 z-50 ${isInfoSidebarOpen ? 'left-72' : 'left-0'}`}>
         <button
           aria-label={isInfoSidebarOpen ? 'Close sidebar' : 'Open sidebar'}
           onClick={() => setIsInfoSidebarOpen(v => !v)}
