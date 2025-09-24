@@ -16,8 +16,7 @@ import {
   Send,
   Loader2,
   ChevronLeft,
-  ChevronRight,
-  X
+  ChevronRight
 } from 'lucide-react';
 
 import { 
