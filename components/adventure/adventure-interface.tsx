@@ -492,8 +492,8 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
             </div>
           </div>
 
-          <div className="bg-card/95 backdrop-blur-xl border-t border-border p-6 shadow-xl">
-            <div className="max-w-4xl space-y-4">
+          <div className="bg-card/95 backdrop-blur-xl border-t border-border p-3 shadow-xl">
+            <div className="max-w-4xl space-y-2">
               <div className="flex space-x-3">
                 <div className="flex-1 relative">
                   <Input
@@ -502,7 +502,7 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
                     onChange={(e) => setCurrentInput(e.target.value)}
                     onKeyPress={handleKeyPress}
                     disabled={gameState.isLoading}
-                    className="bg-muted/70 border-border text-foreground placeholder:text-muted-foreground pr-12 py-3 text-sm focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                    className="bg-muted/70 border-border text-foreground placeholder:text-muted-foreground pr-10 py-2 text-sm focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 transition-all"
                   />
                   <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                     <Badge variant="secondary" className="text-xs bg-gradient-to-r from-cyan-400/10 to-blue-500/10 text-cyan-300">
@@ -510,26 +510,14 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
                     </Badge>
                   </div>
                 </div>
-                <Button 
-                  onClick={handleAction} 
+                <Button
+                  onClick={handleAction}
                   disabled={!currentInput.trim() || gameState.isLoading}
-                  className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-6"
+                  size="sm"
+                  className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-4"
                 >
                   <Send className="w-4 h-4" />
                 </Button>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {['look around', 'examine', 'take item', 'go north', 'attack', 'inventory', 'help'].map((action) => (
-                  <Button
-                    key={action}
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setCurrentInput(action)}
-                    className="text-xs text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
-                  >
-                    {action}
-                  </Button>
-                ))}
               </div>
             </div>
           </div>
