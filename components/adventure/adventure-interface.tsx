@@ -54,6 +54,12 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
   const [showSettings, setShowSettings] = useState(false);
   const [showComposer, setShowComposer] = useState(false);
   const [isInfoSidebarOpen, setIsInfoSidebarOpen] = useState(false);
+
+  // Turn composer behavior
+  type TurnMode = 'say' | 'do' | 'story' | 'see';
+  const [turnMode, setTurnMode] = useState<TurnMode>('say');
+  const [isModeSliderOpen, setIsModeSliderOpen] = useState(false);
+
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -209,7 +215,7 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
       apple: '🍎',
       torch: '🔥',
       book: '📜',
-      scroll: '📜',
+      scroll: '��',
       armor: '🥋'
     };
     for (const k of Object.keys(EMOJI_MAP)) {
