@@ -359,10 +359,14 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
           {/* Status Panel (Player, Nature, Stats, Skill) */}
           <Card className="bg-muted/70 border-border shadow-lg hover:shadow-xl transition-shadow duration-300">
             <CardContent className="space-y-3 text-[9px] text-white/90">
-              {/* Player */}
-              <div className="flex items-center gap-3">
-                <span className="font-semibold">Player</span>
-                <span className="text-white/90">Cha Yeon-woo</span>
+              <div className="mb-2">
+                <span className="text-xs text-muted-foreground uppercase tracking-wide">User status</span>
+                <div className="flex items-center gap-3 mt-1">
+                  <span className="font-semibold">Player</span>
+                  <div className="inline-block px-2 py-1 text-sm rounded-md bg-muted/40 border border-border text-white/90">
+                    {gameState.player.name}
+                  </div>
+                </div>
               </div>
 
               {/* Nature */}
@@ -472,37 +476,24 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
         {/* Main Game Area */}
         <div className="flex-1 min-h-0 flex flex-col bg-background">
           <div className="flex-1 p-6 overflow-y-auto scroll-container scrollbar-thin" ref={scrollAreaRef}>
-            <div className="space-y-4 max-w-4xl">
+            <div className="space-y-6 w-full">
               {gameState.gameHistory.map((message) => (
                 <div key={message.id} className="animate-fadeIn">
-                  <div className={`p-4 rounded-xl backdrop-blur-sm border transition-all duration-300 hover:shadow-lg ${
-                    message.type === 'user' 
-                      ? 'bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border-blue-500/20 ml-12 shadow-blue-500/10' 
-                      : message.type === 'game'
-                      ? 'bg-muted/50 border-border mr-12 shadow-lg'
-                      : 'bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-amber-500/20 text-center shadow-amber-500/10'
-                  }`}>
-                    <div className="flex items-center justify-between mb-3">
-                      <Badge 
-                        variant="outline" 
-                        className={`text-xs font-medium ${
-                          message.type === 'user' 
-                            ? 'bg-blue-500/10 text-blue-300 border-blue-500/30' 
-                            : message.type === 'game'
-                            ? 'bg-green-500/10 text-green-300 border-green-500/30'
-                            : 'bg-amber-500/10 text-amber-300 border-amber-500/30'
-                        }`}
-                      >
-                        {message.type === 'user' ? '⚡ You' : message.type === 'game' ? '🎲 Game Master' : '⚙️ System'}
-                      </Badge>
-                      <span className="text-xs text-muted-foreground bg-muted/30 px-2 py-1 rounded-full">
-                        {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </span>
+                  {message.type === 'user' ? (
+                    <div className="w-full">
+                      <p className="border-l-2 border-blue-500/40 pl-3 text-base leading-relaxed whitespace-pre-wrap text-muted-foreground italic">
+                        {message.content.replace(/^(Actions|Story)\s*:\s*/i, '')}
+                      </p>
                     </div>
-                    <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground">
+                  ) : message.type === 'game' ? (
+                    <p className="text-base leading-relaxed whitespace-pre-wrap w-full">
                       {message.content}
                     </p>
-                  </div>
+                  ) : (
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap text-muted-foreground text-center w-full">
+                      {message.content}
+                    </p>
+                  )}
                 </div>
               ))}
               {gameState.isLoading && (
@@ -521,7 +512,7 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
           </div>
 
           <div className="bg-card/95 backdrop-blur-xl border-t border-border p-3 shadow-xl">
-            <div className="max-w-6xl w-full">
+            <div className="w-full">
               {showComposer ? (
                 <div className="flex items-end gap-3">
                   <div className="flex-1 relative w-full">
