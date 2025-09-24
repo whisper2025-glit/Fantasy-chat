@@ -9,6 +9,10 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  // Configure for Replit environment
+  experimental: {
+    allowedHosts: true,
+  },
 }
 
 export default nextConfig
