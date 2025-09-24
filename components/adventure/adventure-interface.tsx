@@ -375,19 +375,21 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
                   .flatMap(([name, count]) => Array.from({ length: count }, () => name));
                 const slots = Array.from({ length: 20 }, (_, i) => items[i] ?? null);
                 return (
-                  <div className="grid grid-cols-4 gap-2">
-                    {slots.map((name, i) => (
-                      <div
-                        key={i}
-                        className={`relative aspect-square rounded-md border border-border ${name ? 'bg-muted/60 hover:bg-muted' : 'bg-muted/30'} flex items-center justify-center text-lg select-none transition-colors`}
-                      >
-                        {name ? (
-                          <span title={name} aria-label={name}>{getItemEmoji(name)}</span>
-                        ) : (
-                          <span className="text-muted-foreground/30">•</span>
-                        )}
-                      </div>
-                    ))}
+                  <div className="max-h-48 overflow-y-auto pr-1 scrollbar-thin">
+                    <div className="grid grid-cols-4 gap-2">
+                      {slots.map((name, i) => (
+                        <div
+                          key={i}
+                          className={`relative aspect-square rounded-md border border-border ${name ? 'bg-muted/60 hover:bg-muted' : 'bg-muted/30'} flex items-center justify-center text-lg select-none transition-colors`}
+                        >
+                          {name ? (
+                            <span title={name} aria-label={name}>{getItemEmoji(name)}</span>
+                          ) : (
+                            <span className="text-muted-foreground/30">•</span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 );
               })()}
