@@ -265,7 +265,7 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
       )}
 
       {/* Slide-out Info Sidebar: Current Location, Skills, Inventory */}
-      <div className={`fixed top-0 left-0 h-full w-80 bg-card/95 backdrop-blur-xl border-r border-border transform transition-transform duration-300 z-40 shadow-2xl ${isInfoSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <div className={`fixed top-0 left-0 h-full overflow-y-auto w-80 bg-card/95 backdrop-blur-xl border-r border-border transform transition-transform duration-300 z-40 shadow-2xl ${isInfoSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="p-6 space-y-6">
           {/* Current Location */}
           <Card className="bg-muted/70 border-border shadow-lg hover:shadow-xl transition-shadow duration-300">
@@ -365,9 +365,9 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
         <button
           aria-label={isInfoSidebarOpen ? 'Close sidebar' : 'Open sidebar'}
           onClick={() => setIsInfoSidebarOpen(v => !v)}
-          className="bg-card/90 backdrop-blur border border-border rounded-r-xl p-2 hover:bg-muted transition-colors shadow-lg"
+          className="bg-card/90 backdrop-blur rounded-r-lg p-1 hover:bg-muted/80 transition-colors shadow-md outline-none focus:outline-none focus:ring-0 active:scale-95"
         >
-          {isInfoSidebarOpen ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
+          {isInfoSidebarOpen ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
         </button>
       </div>
 
