@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -12,7 +11,6 @@ import {
   Star,
   Backpack,
   Map,
-  Settings,
   Send,
   Loader2,
   ChevronLeft,
@@ -23,7 +21,7 @@ import {
   GameState, 
   GameMessage
 } from '@/lib/adventure-types';
-import { openRouterService } from '@/lib/openrouter-service';
+import { adventureEngine } from '@/lib/adventure-engine';
 import { ETHORIA_WORLD, STARTING_PLAYER, STARTING_LOCATION } from '@/lib/ethoria-data';
 
 interface AdventureInterfaceProps {
@@ -49,8 +47,6 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
     isLoading: false
   });
   const [currentInput, setCurrentInput] = useState('');
-  const [apiKey, setApiKey] = useState('');
-  const [showSettings, setShowSettings] = useState(false);
   const [showComposer, setShowComposer] = useState(false);
   const [isInfoSidebarOpen, setIsInfoSidebarOpen] = useState(false);
 
@@ -82,11 +78,6 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
     }
   }, [gameState.gameHistory]);
 
-  useEffect(() => {
-    if (apiKey) {
-      openRouterService.setApiKey(apiKey);
-    }
-  }, [apiKey]);
 
   const addMessage = (content: string, type: 'user' | 'game' | 'system') => {
     const newMessage: GameMessage = {
@@ -104,11 +95,6 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
 
   const handleAction = async () => {
     if (!currentInput.trim()) return;
-    if (!apiKey) {
-      alert('Please set your OpenRouter API key in settings first!');
-      setShowSettings(true);
-      return;
-    }
 
     const prefixMap: Record<TurnMode, string> = {
       actions: 'Actions',
@@ -121,13 +107,13 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
     setGameState(prev => ({ ...prev, isLoading: true }));
 
     try {
-      const isSafe = await openRouterService.checkContentSafety(userAction);
+      const isSafe = adventureEngine.checkContentSafety(userAction);
       if (!isSafe) {
         addMessage('This action was blocked for safety reasons. Please try something else.', 'system');
         return;
       }
 
-      const response = await openRouterService.generateAdventureResponse(
+      const response = await adventureEngine.generateAdventureResponse(
         userAction, 
         gameState,
         gameState.gameHistory.map(msg => ({
@@ -268,59 +254,9 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
             </Button>
             <div className="flex items-center" />
           </div>
-          <Button 
-            onClick={() => setShowSettings(!showSettings)} 
-            variant="ghost"
-            className="text-muted-foreground hover:text-foreground transition-colors p-2 hover:bg-muted/50 rounded-lg"
-          >
-            <Settings className="w-5 h-5" />
-          </Button>
         </div>
       </div>
 
-      {showSettings && (
-        <div className="bg-card/95 backdrop-blur-xl border-b border-border p-6 shadow-lg">
-          <div className="max-w-2xl">
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-lg flex items-center justify-center">
-                <Settings className="w-4 h-4 text-black" />
-              </div>
-              <h3 className="text-lg font-semibold text-white">Game Configuration</h3>
-            </div>
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium text-foreground mb-2 block">OpenRouter API Key</label>
-                <Input
-                  type="password"
-                  placeholder="Enter your OpenRouter API key"
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                  className="bg-muted/70 border-border text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
-                />
-                <div className="mt-2 space-y-1">
-                  <p className="text-xs text-muted-foreground">
-                    Get your free API key at{' '}
-                    <a 
-                      href="https://openrouter.ai" 
-                      target="_blank" 
-                      rel="noopener" 
-                      className="text-blue-400 hover:text-blue-300 underline transition-colors"
-                    >
-                      openrouter.ai
-                    </a>
-                  </p>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                    <p className="text-xs text-muted-foreground">
-                      Multi-model AI system active: Grok • GLM • DeepSeek • Dolphin • Kimi
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Slide-out Info Sidebar: Current Location, Skills, Inventory */}
       <div className={`fixed top-0 left-0 h-full overflow-y-auto w-72 bg-card/95 backdrop-blur-xl border-r border-border transform transition-transform duration-300 z-40 shadow-2xl ${isInfoSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
