@@ -476,9 +476,11 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
               {gameState.gameHistory.map((message) => (
                 <div key={message.id} className="animate-fadeIn">
                   {message.type === 'user' ? (
-                    <p className="text-base leading-relaxed whitespace-pre-wrap w-full">
-                      <span className="font-semibold">You say:</span> {message.content.replace(/^(Actions|Story)\s*:\s*/i, '')}
-                    </p>
+                    <div className="w-full">
+                      <p className="border-l-2 border-blue-500/40 pl-3 text-base leading-relaxed whitespace-pre-wrap">
+                        {message.content.replace(/^(Actions|Story)\s*:\s*/i, '')}
+                      </p>
+                    </div>
                   ) : message.type === 'game' ? (
                     <p className="text-base leading-relaxed whitespace-pre-wrap w-full">
                       {message.content}
