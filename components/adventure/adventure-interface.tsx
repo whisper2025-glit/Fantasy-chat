@@ -3,24 +3,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import {
-  Sword,
-  Heart,
-  Star,
   Backpack,
   Map,
-  Settings,
   Send,
   Loader2,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Settings
 } from 'lucide-react';
 
-import { 
-  GameState, 
+import {
+  GameState,
   GameMessage
 } from '@/lib/adventure-types';
 import { openRouterService } from '@/lib/openrouter-service';
@@ -104,11 +101,6 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
 
   const handleAction = async () => {
     if (!currentInput.trim()) return;
-    if (!apiKey) {
-      alert('Please set your OpenRouter API key in settings first!');
-      setShowSettings(true);
-      return;
-    }
 
     const prefixMap: Record<TurnMode, string> = {
       actions: 'Actions',
@@ -121,14 +113,8 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
     setGameState(prev => ({ ...prev, isLoading: true }));
 
     try {
-      const isSafe = await openRouterService.checkContentSafety(userAction);
-      if (!isSafe) {
-        addMessage('This action was blocked for safety reasons. Please try something else.', 'system');
-        return;
-      }
-
       const response = await openRouterService.generateAdventureResponse(
-        userAction, 
+        userAction,
         gameState,
         gameState.gameHistory.map(msg => ({
           role: msg.type === 'user' ? 'user' : 'assistant',
@@ -230,7 +216,7 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
       bow: '🏹',
       axe: '🪓',
       food: '🍖',
-      apple: '🍎',
+      apple: '����',
       torch: '🔥',
       book: '📜',
       scroll: '📜',
@@ -259,8 +245,8 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
       <div className="flex-shrink-0 sticky top-0 bg-card/95 backdrop-blur-xl border-b border-border px-6 py-4 z-30 shadow-xl">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-6">
-            <Button 
-              onClick={onBack} 
+            <Button
+              onClick={onBack}
               variant="ghost"
               className="text-muted-foreground hover:text-foreground transition-colors p-2 hover:bg-muted/50 rounded-lg"
             >
@@ -268,8 +254,8 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
             </Button>
             <div className="flex items-center" />
           </div>
-          <Button 
-            onClick={() => setShowSettings(!showSettings)} 
+          <Button
+            onClick={() => setShowSettings(!showSettings)}
             variant="ghost"
             className="text-muted-foreground hover:text-foreground transition-colors p-2 hover:bg-muted/50 rounded-lg"
           >
@@ -299,11 +285,11 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
                 />
                 <div className="mt-2 space-y-1">
                   <p className="text-xs text-muted-foreground">
-                    Get your free API key at{' '}
-                    <a 
-                      href="https://openrouter.ai" 
-                      target="_blank" 
-                      rel="noopener" 
+                    Get your API key at{' '}
+                    <a
+                      href="https://openrouter.ai"
+                      target="_blank"
+                      rel="noopener"
                       className="text-blue-400 hover:text-blue-300 underline transition-colors"
                     >
                       openrouter.ai
@@ -312,7 +298,7 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                     <p className="text-xs text-muted-foreground">
-                      Multi-model AI system active: Grok • GLM • DeepSeek • Dolphin • Kimi
+                      Model active: cognitivecomputations/dolphin-mistral-24b-venice-edition
                     </p>
                   </div>
                 </div>
