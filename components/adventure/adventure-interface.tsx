@@ -63,7 +63,7 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
     if (scrollAreaRef.current) {
       scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
     }
-  }, [gameState.gameHistory]);
+  }, [gameState?.gameHistory]);
 
   useEffect(() => {
     if (apiKey) {
@@ -79,10 +79,10 @@ export function AdventureInterface({ onBack }: AdventureInterfaceProps) {
       timestamp: new Date()
     };
 
-    setGameState(prev => ({
+    setGameState(prev => prev ? ({
       ...prev,
       gameHistory: [...prev.gameHistory, newMessage]
-    }));
+    }) : prev);
   };
 
   const handleStoryGenerated = (context: StoryContext) => {
